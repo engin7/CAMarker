@@ -17,6 +17,18 @@ extension UIView {
     }
 }
 
+extension CGRect {
+    // add padding later with scale factor
+    func getCorners(offset: CGFloat) -> [CGPoint] {
+        let lt = CGPoint(x: self.minX-offset, y: self.minY-offset)
+        let lb = CGPoint(x: self.minX-offset, y: self.maxY+offset)
+        let rb = CGPoint(x: self.maxX+offset, y: self.maxY+offset)
+        let rt = CGPoint(x: self.maxX+offset, y: self.minY-offset)
+        return [lt,lb,rb,rt]
+    }
+}
+
+
 extension CGPoint {
  
    

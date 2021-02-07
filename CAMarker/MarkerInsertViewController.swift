@@ -40,7 +40,6 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
     }
     
     var drawingMode = drawMode.dropPin
-
     enum drawMode {
         case dropPin
         case drawRect
@@ -49,7 +48,6 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         case noDrawing
     }
 
-    
     // MARK: - Color Picker Controls
 
     @IBOutlet var colorPickerStackView: UIStackView!
@@ -81,8 +79,6 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
             print("Unknown color")
             return
         }
-        pinImage?.tintColor = drawingColor.associatedColor.withAlphaComponent(1.0)
-        selectedLayer?.fillColor? = drawingColor.associatedColor.cgColor
         animateColorPicker()
     }
     
@@ -243,22 +239,12 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
      
      var singleTapRecognizer: UITapGestureRecognizer!
      var dragPanRecognizer: UIPanGestureRecognizer!
-     let notificationCenter = NotificationCenter.default
 
-     var currentLayer: CAShapeLayer?
-     var selectedLayer: CAShapeLayer?
-     var pinViewTapped: UIView?
-     var pinViewAdded: UIView?
-     var pinImage: UIView?
-     var handImageView = UIImageView()
-     var cornersImageView: [UIImageView] = []
-    
-    let selectedShapeLayer: CAShapeLayer = {
+     var currentShapeLayer: CAShapeLayer = {
         let shapeLayer = CAShapeLayer()
         shapeLayer.strokeColor = UIColor.black.cgColor
         shapeLayer.fillColor = UIColor.clear.cgColor
-        shapeLayer.lineWidth = 4
-        shapeLayer.lineDashPattern = [10, 5, 5, 5]
+        shapeLayer.lineWidth = 2
         return shapeLayer
     }()
 
@@ -276,13 +262,13 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
 
     func resetUI() {
         saveButton.isEnabled = false
-        pinViewAdded?.removeFromSuperview()
-        selectedLayer?.removeFromSuperlayer()
-        removeAuxiliaryOverlays()
-        addedObject = nil
-        pinViewAdded = nil
+        currentShapeLayer.path = nil
+        currentShapeLayer.removeFromSuperlayer()
+        currentShapeLayer.sublayers?.forEach { $0.removeFromSuperlayer()}
+        deleteButton.removeFromSuperview()
+        view.layoutSubviews()
     }
-  
+    
     func configureStackViews() {
         colorInfo = drawingColor.associatedColor.withAlphaComponent(1.0).htmlRGBaColor
         bottomColorButton.layer.cornerRadius = 16
@@ -325,174 +311,141 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         imageView.isUserInteractionEnabled = true
         imageView.addGestureRecognizer(dragPanRecognizer) // pan tutup surmek
     }
- 
-   
-    // MARK: - Adding Pin
-
-    func addTag(withLocation location: CGPoint, toPhoto photo: UIImageView) {
-        deleteButton.frame.origin = CGPoint(x: location.x - 17, y: location.y - 130)
-        imageView.addSubview(deleteButton)
-
-        let frame = CGRect(x: location.x - 20, y: location.y - 80, width: 80, height: 80)
-        let pinViewTapped = UIView(frame: frame)
-        pinViewTapped.isUserInteractionEnabled = true
-        let pinImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 40, height: 80))
-        let originalImage = #imageLiteral(resourceName: "pin.circle.fill")
-        let templateImage = originalImage.withRenderingMode(.alwaysTemplate)
-        pinImageView.image = templateImage
-        pinImageView.tintColor = drawingColor.associatedColor.withAlphaComponent(1.0)
-        pinImageView.tag = 4
-        pinViewTapped.addSubview(pinImageView)
-        pinImage = pinImageView
-   
-        pinViewTapped.tag = 2
-        photo.addSubview(pinViewTapped)
-        pinViewAdded = pinViewTapped
-        // recordId & recordTypeId will come from previous VC textfield.
-        vectorType = .PIN(point: location)
-        vectorData = VectorMetaData(color: colorInfo, iconUrl: "put pin URL here", recordId: "", recordTypeId: "")
-    }
-
-    // MARK: - Image Picker
-
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-        guard let image = info[.editedImage] as? UIImage else { return }
-
-        dismiss(animated: true)
-        guard let pin = pinViewTapped else { return }
-        // remove old pin
-        pin.subviews.forEach({ if $0.tag == 4 { $0.removeFromSuperview() }})
-        pin.tag = 2
-
-        let frame = CGRect(x: 1, y: 20, width: 38, height: 50)
-        let cone = UIImageView(frame: frame)
-        cone.image = #imageLiteral(resourceName: "arrowtriangle.down.fill")
-        cone.tag = 3
-        pin.addSubview(cone)
-
-        let circleImage = UIImageView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
-        circleImage.image = image
-        circleImage.layer.masksToBounds = false
-        circleImage.layer.cornerRadius = pin.frame.height / 2
-        circleImage.layer.borderWidth = 2
-        circleImage.layer.borderColor = UIColor.systemBlue.cgColor
-        circleImage.clipsToBounds = true
-        circleImage.tag = 4
-        pin.addSubview(circleImage)
-        imageView.bringSubviewToFront(pin)
-        pinViewTapped = nil
-    }
-
+    
     // MARK: - Helper method for drawing Shapes
 
     private func drawShape(touch: CGPoint, mode: drawMode) -> UIBezierPath {
+        let scale = CGFloat(5)
         let shapeSize = min(imageView.bounds.width, imageView.bounds.height) / 10
         let size = CGSize(width: shapeSize, height: shapeSize)
         let frame = CGRect(origin: touch, size: size)
-
+        let corners = frame.getCorners(offset: scale)
+        
         switch mode {
-        case .drawRect:
-            return UIBezierPath(rect: frame)
-        case .drawEllipse:
-            return UIBezierPath(roundedRect: frame, cornerRadius: shapeSize)
-        default:
-            return UIBezierPath()
+            case .dropPin:
+                return drawPin(touch)
+            case .drawRect:
+                addCornerPoints(corners,distance:scale)
+                return UIBezierPath(rect: frame)
+            case .drawEllipse:
+                addCornerPoints(corners,distance:scale)
+                return UIBezierPath(roundedRect: frame, cornerRadius: shapeSize)
+            default:
+                return UIBezierPath()
         }
     }
-
+    
+    private func drawPin(_ touch: CGPoint) -> UIBezierPath {
+        let thePath = UIBezierPath()
+        thePath.move(to: touch)
+        let lineEnd = CGPoint(x: touch.x, y: touch.y - 30)
+        thePath.addLine(to: lineEnd)
+        let center = CGPoint(x: lineEnd.x, y: lineEnd.y-10)
+        thePath.addArc(withCenter: center, radius: 10, startAngle: CGFloat.pi/2, endAngle: (5/2) * CGFloat.pi, clockwise: true)
+        return thePath
+    }
+    
+    private func addCornerPoints(_ corners: [CGPoint], distance: CGFloat) {
+        
+        for i in 0...3 {
+            let layer = CAShapeLayer()
+            layer.name = "corner" + String(i)
+            layer.strokeColor = UIColor(ciColor: .blue).cgColor
+            layer.fillColor = UIColor(ciColor: .clear).cgColor
+            let path = UIBezierPath()
+            path.lineWidth = distance/2
+            path.move(to: CGPoint(x: corners[i].x, y: corners[i].y+distance))
+            path.addArc(withCenter: corners[i], radius: distance, startAngle: CGFloat.pi/2, endAngle: (5/2) * CGFloat.pi, clockwise: true)
+            path.move(to: CGPoint(x: corners[i].x, y: corners[i].y+distance/2))
+            path.addArc(withCenter: corners[i], radius: distance/2, startAngle: CGFloat.pi/2, endAngle: (5/2) * CGFloat.pi, clockwise: true)
+            layer.path = path.cgPath
+            currentShapeLayer.addSublayer(layer)
+         }
+        if let centerX = corners.centroid()?.x, let minY = corners.map({ $0.y }).min() {
+            deleteButton.frame.origin = CGPoint(x: centerX - 15, y: minY - 50)
+            imageView.addSubview(deleteButton)
+        }
+    }
+  
     private func modifyShape(_ corner: cornerPoint, _ withShift: (x: CGFloat, y: CGFloat)) -> UIBezierPath {
         let thePath = UIBezierPath()
-
-        guard let shape = selectedShapesInitial else { return thePath }
-        guard let leftTop = shape.cornersArray.filter({ $0.corner == .leftTop }).first?.point else { return thePath }
-        guard let leftBottom = shape.cornersArray.filter({ $0.corner == .leftBottom }).first?.point else { return thePath }
-        guard let rightBottom = shape.cornersArray.filter({ $0.corner == .rightBottom }).first?.point else { return thePath }
-        guard let rightTop = shape.cornersArray.filter({ $0.corner == .rightTop }).first?.point else { return thePath }
-
+        var cornersArray: [CGPoint] = [CGPoint.zero,CGPoint.zero,CGPoint.zero,CGPoint.zero]
+         
+         switch initialVectorType  {
+            case .PATH(points: let corners):
+                cornersArray = corners
+            case .ELLIPSE(points: let corners):
+                 cornersArray = corners
+            default:
+              print("")
+        }
+        
+        let leftTop = cornersArray[0]
+        let leftBottom = cornersArray[1]
+        let rightBottom = cornersArray[2]
+        let rightTop = cornersArray[3]
+        
         let shiftedLeftTop = CGPoint(x: leftTop.x + withShift.x, y: leftTop.y + withShift.y)
         let shiftedLeftBottom = CGPoint(x: leftBottom.x + withShift.x, y: leftBottom.y + withShift.y)
         let shiftedRightBottom = CGPoint(x: rightBottom.x + withShift.x, y: rightBottom.y + withShift.y)
         let shiftedRightTop = CGPoint(x: rightTop.x + withShift.x, y: rightTop.y + withShift.y)
-
-        var newCorners: [(corner: cornerPoint, point: CGPoint)] = []
-
+        
+         
+        cornersArray = []
+        
+        var movePoint = CGPoint.zero
+        var firstLine = CGPoint.zero
+        var secondLine = CGPoint.zero
+        var thirdLine = CGPoint.zero
+        
         switch corner {
         case .leftTop:
-
-            thePath.move(to: shiftedLeftTop)
-            thePath.addLine(to: leftBottom)
-            thePath.addLine(to: rightBottom)
-            thePath.addLine(to: rightTop)
-
-            // save points
-            newCorners.append((.leftTop, shiftedLeftTop))
-            newCorners.append((.leftBottom, leftBottom))
-            newCorners.append((.rightBottom, rightBottom))
-            newCorners.append((.rightTop, rightTop))
-
+            movePoint = shiftedLeftTop
+            firstLine = leftBottom
+            secondLine = rightBottom
+            thirdLine = rightTop
         case .leftBottom:
-
-            thePath.move(to: leftTop)
-            thePath.addLine(to: shiftedLeftBottom)
-            thePath.addLine(to: rightBottom)
-            thePath.addLine(to: rightTop)
-
-            // save points
-            newCorners.append((.leftTop, leftTop))
-            newCorners.append((.leftBottom, shiftedLeftBottom))
-            newCorners.append((.rightBottom, rightBottom))
-            newCorners.append((.rightTop, rightTop))
-
+            movePoint = leftTop
+            firstLine = shiftedLeftBottom
+            secondLine = rightBottom
+            thirdLine = rightTop
         case .rightBottom:
-
-            thePath.move(to: leftTop)
-            thePath.addLine(to: leftBottom)
-            thePath.addLine(to: shiftedRightBottom)
-            thePath.addLine(to: rightTop)
-
-            // save points
-            newCorners.append((.leftTop, leftTop))
-            newCorners.append((.leftBottom, leftBottom))
-            newCorners.append((.rightBottom, shiftedRightBottom))
-            newCorners.append((.rightTop, rightTop))
-
+            movePoint = leftTop
+            firstLine = leftBottom
+            secondLine = shiftedRightBottom
+            thirdLine = rightTop
         case .rightTop:
-
-            thePath.move(to: leftTop)
-            thePath.addLine(to: leftBottom)
-            thePath.addLine(to: rightBottom)
-            thePath.addLine(to: shiftedRightTop)
-
-            // save points
-            newCorners.append((.leftTop, leftTop))
-            newCorners.append((.leftBottom, leftBottom))
-            newCorners.append((.rightBottom, rightBottom))
-            newCorners.append((.rightTop, shiftedRightTop))
+            movePoint = leftTop
+            firstLine = leftBottom
+            secondLine = rightBottom
+            thirdLine = shiftedRightTop
 
         case .noCornersSelected:
-
-            print("Corner NOT Selected")
-            thePath.move(to: shiftedLeftTop)
-            thePath.addLine(to: shiftedLeftBottom)
-            thePath.addLine(to: shiftedRightBottom)
-            thePath.addLine(to: shiftedRightTop)
-
-            // save points
-            newCorners.append((.leftTop, shiftedLeftTop))
-            newCorners.append((.leftBottom, shiftedLeftBottom))
-            newCorners.append((.rightBottom, shiftedRightBottom))
-            newCorners.append((.rightTop, shiftedRightTop))
+            movePoint = shiftedLeftTop
+            firstLine = shiftedLeftBottom
+            secondLine = shiftedRightBottom
+            thirdLine = shiftedRightTop
         }
-
+        
+        thePath.move(to: movePoint)
+        thePath.addLine(to: firstLine)
+        thePath.addLine(to: secondLine)
+        thePath.addLine(to: thirdLine)
         thePath.close()
-
+ 
+        // save points
+        cornersArray.append(movePoint)
+        cornersArray.append(firstLine)
+        cornersArray.append(secondLine)
+        cornersArray.append(thirdLine)
+      
+        
         var ellipsePath = UIBezierPath()
-
         if drawingMode == .drawEllipse {
-            guard let leftTop = newCorners.filter({ $0.corner == .leftTop }).first?.point else { return thePath }
-            guard let leftBottom = newCorners.filter({ $0.corner == .leftBottom }).first?.point else { return thePath }
-            guard let rightBottom = newCorners.filter({ $0.corner == .rightBottom }).first?.point else { return thePath }
-            guard let rightTop = newCorners.filter({ $0.corner == .rightTop }).first?.point else { return thePath }
+            let leftTop = cornersArray[0]
+            let leftBottom = cornersArray[1]
+            let rightBottom = cornersArray[2]
+            let rightTop = cornersArray[3]
 
             var lt = CGPoint.zero
             var lb = CGPoint.zero
@@ -543,28 +496,40 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
 
             let radii = min(frame.height, frame.width)
             ellipsePath = UIBezierPath(roundedRect: frame, cornerRadius: radii)
-            newCorners = []
+            cornersArray = []
 
             // save points
-            newCorners.append((.leftTop, lt))
-            newCorners.append((.leftBottom, lb))
-            newCorners.append((.rightBottom, rb))
-            newCorners.append((.rightTop, rt))
+            cornersArray.append(lt)
+            cornersArray.append(lb)
+            cornersArray.append(rb)
+            cornersArray.append(rt)
         }
-
-        var cornerArray: [CGPoint] = []
-        newCorners.forEach { cornerArray.append($0.point) }
-        moveAuxiliaryOverlays(corners: cornerArray)
-
-        if let layer = currentLayer {
-            let shapeEdited = shapeInfo(shape: layer, cornersArray: newCorners)
-            addedObject = shapeEdited
-        }
-
-        if drawingMode == .drawEllipse {
+ 
+        // Save to Model. Update as dragging moved locations.
+        switch drawingMode {
+        
+        case .dropPin:
+            vectorType = .PIN(point: touchedPoint)
+            vectorData = VectorMetaData(color: colorInfo, iconUrl: "put pin URL here", recordId: "", recordTypeId: "")
+            return drawPin(touchedPoint)
+        case .drawRect:
+            currentShapeLayer.sublayers?.forEach {$0.removeFromSuperlayer()}
+            deleteButton.removeFromSuperview()
+            addCornerPoints(cornersArray, distance: 5)
+            vectorType = .PATH(points: cornersArray)
+            vectorData = VectorMetaData(color: colorInfo, iconUrl: "put Rect URL here", recordId: "", recordTypeId: "")
+            return thePath
+        case .drawEllipse:
+            currentShapeLayer.sublayers?.forEach {$0.removeFromSuperlayer()}
+            deleteButton.removeFromSuperview()
+            addCornerPoints(cornersArray, distance: 5)
+            vectorType = .ELLIPSE(points: cornersArray)
+            vectorData = VectorMetaData(color: colorInfo, iconUrl: "put Ellipse URL here", recordId: "", recordTypeId: "")
             return ellipsePath
+        default:
+            print("Sth is wrong!")
+            return UIBezierPath()
         }
-        return thePath
     }
 
     // MARK: - Single Tap Logic
@@ -576,96 +541,39 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
           if colorPickerHeight.constant == 288 {
             shrinkColorPicker()
            }
-        // Highlighting rect
-        imageView.layer.sublayers?.forEach { layer in
-            let layer = layer as? CAShapeLayer
-            if let path = layer?.path, path.contains(touchPoint) {
-                if currentLayer == nil {
-                    currentLayer = layer
-                    selectedShapesInitial = addedObject
-                    var corners: [CGPoint] = []
-                    selectedShapesInitial?.cornersArray.forEach { corners.append($0.point) }
-                    moveAuxiliaryOverlays(corners: corners)
-                }
-            }
-        }
-
-        //  Detect PIN to drag it !!
-        if let pin = touchPoint.getSubViewTouched(imageView: imageView) {
-            // detect PIN
-            if pin.tag == 2 {
-                pinViewTapped = pin
-                pin.subviews.forEach({ if $0.tag == 5 { $0.isHidden = !$0.isHidden }})
-                // add menu to select image
-                let picker = UIImagePickerController()
-                picker.allowsEditing = true
-                picker.delegate = self
-                present(picker, animated: true)
-            }
-        }
-
-        // add new pin if there isnt
-        if currentLayer == nil && drawingMode == .dropPin && pinViewAdded == nil {
-            saveButton.isEnabled = true
-            addTag(withLocation: touchPoint, toPhoto: imageView)
-        }
-
-        // No shape selected or added so add new one
-        if currentLayer == nil && drawingMode != .noDrawing && addedObject == nil && drawingMode != .dropPin {
-            // add shape
+ 
+            // No shape selected or added so add new one
+            if currentShapeLayer.superlayer != imageView.layer && drawingMode != .noDrawing  {
             // draw rectangle, ellipse etc according to selection
-            imageView.layer.addSublayer(selectedShapeLayer)
-            let path = drawShape(touch: touchPoint, mode: drawingMode)
-            selectedShapeLayer.path = path.cgPath
-
-            let rectLayer = CAShapeLayer()
-            rectLayer.strokeColor = UIColor.black.cgColor
-            rectLayer.lineWidth = 4
-            rectLayer.path = selectedShapeLayer.path
-            rectLayer.fillColor? = drawingColor.associatedColor.cgColor
-
-            imageView.layer.addSublayer(rectLayer)
-            selectedLayer = rectLayer
-
-            let minX = rectLayer.path!.boundingBox.minX
-            let minY = rectLayer.path!.boundingBox.minY
-            let maxX = rectLayer.path!.boundingBox.maxX
-            let maxY = rectLayer.path!.boundingBox.maxY
-
-            let lt = CGPoint(x: minX, y: minY)
-            let lb = CGPoint(x: minX, y: maxY)
-            let rb = CGPoint(x: maxX, y: maxY)
-            let rt = CGPoint(x: maxX, y: minY)
-
-            let corners = [(corner: cornerPoint.leftTop, point: lt), (corner: cornerPoint.leftBottom, point: lb), (corner: cornerPoint.rightBottom, point: rb), (corner: cornerPoint.rightTop, point: rt)]
-
-            var cornerPoints: [CGPoint] = []
-            corners.forEach { cornerPoints.append($0.point) }
-
-            addedObject = shapeInfo(shape: rectLayer, cornersArray: corners)
-            addAuxiliaryOverlays(addedObject)
-            
-            switch drawingMode {
-              case .drawRect:
-                saveButton.isEnabled = true
-                vectorType = .PATH(points: cornerPoints)
-                 vectorData = VectorMetaData(color: colorInfo, iconUrl: "put Rect URL here", recordId: "", recordTypeId: "")
-               case .drawEllipse:
-                saveButton.isEnabled = true
-                vectorType = .ELLIPSE(points: cornerPoints)
-                 vectorData = VectorMetaData(color: colorInfo, iconUrl: "put Ellipse url here", recordId: "", recordTypeId: "")
+                currentShapeLayer.fillColor? = drawingColor.associatedColor.cgColor
+                let path = drawShape(touch: touchPoint, mode: drawingMode)
+                currentShapeLayer.path = path.cgPath
+                let cornerPoints = currentShapeLayer.path!.boundingBox.getCorners(offset: 0)
+                imageView.layer.addSublayer(currentShapeLayer)
+ 
+                switch drawingMode {
+                   case .dropPin:
+                    saveButton.isEnabled = true
+                    vectorType = .PIN(point: touchPoint)
+                    vectorData = VectorMetaData(color: colorInfo, iconUrl: "put pin URL here", recordId: "", recordTypeId: "")
+                  case .drawRect:
+                    saveButton.isEnabled = true
+                    vectorType = .PATH(points: cornerPoints)
+                     vectorData = VectorMetaData(color: colorInfo, iconUrl: "put Rect URL here", recordId: "", recordTypeId: "")
+                   case .drawEllipse:
+                    saveButton.isEnabled = true
+                    vectorType = .ELLIPSE(points: cornerPoints)
+                    vectorData = VectorMetaData(color: colorInfo, iconUrl: "put Ellipse url here", recordId: "", recordTypeId: "")
+                  
+                default:
+                    print("Sth is wrong!")
+                }
               
-            default:
-                print("Sth is wrong!")
-            }
         }
         } else {
             print("TAPPING OUTSIDE *******")
         }
-        
-        currentLayer = nil
-        selectedShapeLayer.path = nil
-        
+       
   }
     
     // MARK: - Drag logic
@@ -682,127 +590,54 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         }
     }
 
-    // save shapes info in this struct
-    struct shapeInfo: Equatable {
-        static func == (lhs: MarkerInsertViewController.shapeInfo, rhs: MarkerInsertViewController.shapeInfo) -> Bool {
-            true
-        }
-
-        var shape: CAShapeLayer
-        var cornersArray: [(corner: cornerPoint, point: CGPoint)]
-
-        init(shape: CAShapeLayer, cornersArray: [(cornerPoint, CGPoint)]) {
-            self.shape = shape
-            self.cornersArray = cornersArray
-        }
-    }
-
-    var addedObject: shapeInfo?
-    var selectedShapesInitial: shapeInfo?
     var corner = cornerPoint()
-    var panStartPoint = CGPoint.zero
     var touchedPoint = CGPoint.zero
-
+    var panStartPoint = CGPoint.zero
+    var initialVectorType: LayoutVector?
+        
     @objc func dragging(gesture: UIPanGestureRecognizer) {
         if gesture.state == UIGestureRecognizer.State.began {
             if colorPickerHeight.constant == 288 {
                 shrinkColorPicker()
             }
-            panStartPoint = dragPanRecognizer.location(in: imageView)
+              panStartPoint = dragPanRecognizer.location(in: imageView)
              
             // define in which corner we are: (default is no corners)
             let positions = [cornerPoint.leftTop, cornerPoint.leftBottom, cornerPoint.rightBottom, cornerPoint.rightTop]
-            if !cornersImageView.isEmpty && cornersImageView.allSatisfy({ $0.isHidden == false }) {
-                for i in 0 ... 3 {
-                    let x = cornersImageView[i].frame.origin.x + 15
-                    let y = cornersImageView[i].frame.origin.y + 15
-                    if CGPoint(x: x, y: y).distance(to: panStartPoint) < 44 {
-                        corner = positions[i]
-                    }
-                }
-            }
-
-            // TODO: - Refactor this point detection
+            let cornersName = ["corner0", "corner1", "corner2", "corner3"]
             imageView.layer.sublayers?.forEach { layer in
                 let layer = layer as? CAShapeLayer
-                if let path = layer?.path, corner != .noCornersSelected || path.contains(panStartPoint) {
-                    if currentLayer == nil {
-                        currentLayer = layer!
-                        selectedShapesInitial = addedObject
+                 if let path = layer?.path, path.contains(panStartPoint) {
+                    print(layer!.name)
+                    initialVectorType = vectorType
+                    for i in 0 ... 3 {
+                        if layer?.name == cornersName[i] {
+                            corner = positions[i] // detected corner by searching sublayer
+                        }
                     }
                 }
             }
-
-            // detect PIN to drag it (no shape condition)
-            if let pin = panStartPoint.getSubViewTouched(imageView: imageView) {
-                // detect PIN
-                if pin.tag == 2 {
-                    pinViewTapped = pin
-                }
-            }
-          
-            }
+         }
             touchedPoint = panStartPoint // to offset reference
-        
-        if gesture.state == UIGestureRecognizer.State.changed && (currentLayer != nil || pinViewTapped != nil) {
+        if gesture.state == UIGestureRecognizer.State.changed && initialVectorType != nil {
             // we're inside selection
             print("&&&&&&&  TOUCHING")
             print(corner)
-
             let currentPoint = dragPanRecognizer.location(in: imageView)
-           
             if  !imageSafeArea.contains(currentPoint) {
                   resetDrag()
-                 return
+                  return
             }
-            
             scrollView.isScrollEnabled = false // disabled scroll
-
             let offset = (x: currentPoint.x - touchedPoint.x, y: currentPoint.y - touchedPoint.y)
             print(offset)
- 
-            if pinViewTapped != nil {
-                 // TODO: Refactor here. Cleaner to use Transform. minor bug flickering
-                let pinOffset = (x: currentPoint.x - (pinViewTapped?.frame.minX)!, y: currentPoint.y - (pinViewTapped?.frame.minY)!)
-                pinViewTapped?.frame.origin = CGPoint(x: (pinViewTapped?.frame.origin.x)! + pinOffset.x, y: (pinViewTapped?.frame.origin.y)! + pinOffset.y)
-                deleteButton.frame.origin = CGPoint(x: (pinViewTapped?.frame.origin.x)! + 3, y: (pinViewTapped?.frame.origin.y)! - 50)
-            }
-            currentLayer?.path = modifyShape(corner, offset).cgPath
+            currentShapeLayer.path = modifyShape(corner, offset).cgPath
             touchedPoint = currentPoint
-                
         }
 
         if gesture.state == UIGestureRecognizer.State.ended   {
-            var cornerArray: [CGPoint] = []
-            addedObject?.cornersArray.forEach { cornerArray.append($0.point) }
-
-            // Save to Model. Update as dragging moved locations.
-            switch drawingMode {
             
-            case .dropPin:
-                vectorType = .PIN(point: touchedPoint)
-                vectorData = VectorMetaData(color: colorInfo, iconUrl: "put pin URL here", recordId: "", recordTypeId: "")
-              
-            case .drawRect:
-                vectorType = .PATH(points: cornerArray)
-                vectorData = VectorMetaData(color: colorInfo, iconUrl: "put Rect URL here", recordId: "", recordTypeId: "")
-               
-            case .drawEllipse:
-                vectorType = .ELLIPSE(points: cornerArray)
-                vectorData = VectorMetaData(color: colorInfo, iconUrl: "put Ellipse URL here", recordId: "", recordTypeId: "")
-                
-            default:
-                print("Sth is wrong!")
-            }
-
-            // if clicked on rotation image cancel scrollView pangesture
-            
-            // update the intial shape with edited edition
-            selectedShapesInitial = addedObject
-
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [self] in
-                selectedLayer = currentLayer
-                currentLayer = nil
                 scrollView.isScrollEnabled = true // enabled scroll
             }
                 resetDrag()
@@ -813,78 +648,16 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
     func resetDrag() {
         corner = .noCornersSelected
         touchedPoint = CGPoint.zero
-        panStartPoint = CGPoint.zero
-        pinViewTapped = nil
     }
-
-    func addAuxiliaryOverlays(_ shape: shapeInfo?) {
-        // reset
-        guard let shape = shape else { return }
-        let corners = getCorners(shape: shape)
-
-        removeAuxiliaryOverlays()
-
-        for i in 0 ... 3 {
-            let imageView = UIImageView(image: #imageLiteral(resourceName: "largecircle.fill.circle"))
-            imageView.frame.origin = CGPoint(x: corners[i].x - 15, y: corners[i].y - 15)
-            imageView.frame.size = CGSize(width: 30, height: 30)
-            self.imageView.addSubview(imageView)
-            cornersImageView.append(imageView)
-        }
-        if let centerX = corners.centroid()?.x, let minY = corners.map({ $0.y }).min() {
-            deleteButton.frame.origin = CGPoint(x: centerX - 15, y: minY - 50)
-            imageView.addSubview(deleteButton)
-        }
-    }
-
-    func moveAuxiliaryOverlays(corners: [CGPoint]) {
-//        let corners = [leftTopOrigin,leftBottomOrigin,rightBottomOrigin,rightTopOrigin]
-
-        if cornersImageView.count != 0 {
-            for i in 0 ... 3 {
-                cornersImageView[i].frame.origin = CGPoint(x: corners[i].x - 15, y: corners[i].y - 15)
-            }
-            if let centerX = corners.centroid()?.x, let minY = corners.map({ $0.y }).min() {
-                deleteButton.frame.origin = CGPoint(x: centerX - 15, y: minY - 50)
-            }
-        }
-    }
-
-    func removeAuxiliaryOverlays() {
-        if cornersImageView.count != 0 {
-            for i in 0 ... 3 {
-                cornersImageView[i].removeFromSuperview()
-            }
-            cornersImageView = [] // reset
-        }
-        deleteButton.removeFromSuperview()
-    }
-
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
-        return true
-    }
-
-    func getCorners(shape: shapeInfo) -> [CGPoint] {
-        guard let leftTop = shape.cornersArray.filter({ $0.corner == .leftTop }).first?.point else { return [] }
-        guard let leftBottom = shape.cornersArray.filter({ $0.corner == .leftBottom }).first?.point else { return [] }
-        guard let rightBottom = shape.cornersArray.filter({ $0.corner == .rightBottom }).first?.point else { return [] }
-        guard let rightTop = shape.cornersArray.filter({ $0.corner == .rightTop }).first?.point else { return [] }
-
-        let corners = [leftTop, leftBottom, rightBottom, rightTop]
-        return corners
-    }
-
+ 
     // MARK: - ScrollView zoom, drag etc
 
     @IBOutlet var scrollView: UIScrollView!
     @IBOutlet var imageView: UIImageView!
-    
     @IBOutlet var imageViewBottomConstraint: NSLayoutConstraint!
     @IBOutlet var imageViewLeadingConstraint: NSLayoutConstraint!
     @IBOutlet var imageViewTopConstraint: NSLayoutConstraint!
     @IBOutlet var imageViewTrailingConstraint: NSLayoutConstraint!
-    
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
                            shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
