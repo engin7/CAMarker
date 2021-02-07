@@ -1,27 +1,15 @@
-
-
-//
 //  MarkerInsertViewController.swift
-//  ImageMap
-//
-//  Created by Engin KUK on 11.01.2021.
-//
 
 import UIKit
 
 class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestureRecognizerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    // TODO: - integrate models.
-
+ 
     var inputBundle: InputBundle?
     var vectorType: LayoutVector?
-    var vectorData: VectorMetaData?
-    var recordId = ""
-    var recordTypeId = ""
+    var vectorData: VectorMetaData? // pin/shape info
     private var toSave: ((LayoutMapData) -> Void)?
-     
-    
+      
     @IBOutlet weak var saveButton: UIBarButtonItem!
-     
     @IBAction func saveButtonPressed(_ sender: Any) {
         if vectorType != nil, vectorData != nil {
             let data = LayoutMapData(vector: vectorType!, metaData: vectorData!)
@@ -33,78 +21,24 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
             }
         }
     }
- 
-    @IBOutlet var colorPickerStackView: UIStackView!
-    @IBOutlet var colorPickerBackgroundView: UIView!
-
-    @IBOutlet var controlView: UIView!
-    @IBOutlet var scrollView: UIScrollView!
-    @IBOutlet var imageViewBottomConstraint: NSLayoutConstraint!
-    @IBOutlet var imageViewLeadingConstraint: NSLayoutConstraint!
-    @IBOutlet var imageViewTopConstraint: NSLayoutConstraint!
-    @IBOutlet var imageViewTrailingConstraint: NSLayoutConstraint!
-    @IBOutlet var imageView: UIImageView!
-    @IBOutlet var pinButton: UIButton!
-
-    @IBAction func pinButtonPressed(_ sender: UIButton) {
-        if drawingMode != drawMode.dropPin {
+    // MARK: - Draw Controls    
+    @IBAction func changeDraw(button: UIButton) {
+        if !button.isSelected { resetUI() }
+        let _ = button.superview?.subviews.compactMap{ $0 as? UIButton }.map { $0.isSelected = false }
+        button.isSelected = true
+        switch button.tag {
+        case 0:
             drawingMode = drawMode.dropPin
-            pinButton.isSelected = true
-            rectButton.isSelected = false
-            ellipseButton.isSelected = false
-            resetUI()
-        }
-    }
-
-    @IBOutlet var rectButton: UIButton!
-    @IBAction func rectButtonPressed(_ sender: UIButton) {
-        if drawingMode != drawMode.drawRect {
+        case 1:
             drawingMode = drawMode.drawRect
-            pinButton.isSelected = false
-            rectButton.isSelected = true
-            ellipseButton.isSelected = false
-            resetUI()
-        }
-    }
-
-    @IBOutlet var ellipseButton: UIButton!
-    @IBAction func ellipseButtonPressed(_ sender: UIButton) {
-        if drawingMode != drawMode.drawEllipse {
+        case 2:
             drawingMode = drawMode.drawEllipse
-            pinButton.isSelected = false
-            rectButton.isSelected = false
-            ellipseButton.isSelected = true
-            resetUI()
+        default:
+            print("Unknown shape")
+            return
         }
     }
-   //FIXME: - scaling issues
-    lazy var imageSafeArea: CGRect = {
-           var safeArea = CGRect.zero
-        if  let size = imageView.image?.size {
-            let width = size.width
-            let height = size.height
-            safeArea = CGRect(x: width/50, y: height/50, width: width * 0.9, height: height * 0.9)
-       }
-          return safeArea
-    } ()
     
-    var singleTapRecognizer: UITapGestureRecognizer!
-    var rotationPanRecognizer: UIPanGestureRecognizer!
-    let notificationCenter = NotificationCenter.default
-
-    var currentLayer: CAShapeLayer?
-    var selectedLayer: CAShapeLayer?
-    var pinViewTapped: UIView?
-    var pinViewAdded: UIView?
-    var pinImage: UIView?
-    var handImageView = UIImageView()
-    var cornersImageView: [UIImageView] = []
-
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
-                           shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        return true
-    }
-
     var drawingMode = drawMode.dropPin
 
     enum drawMode {
@@ -115,38 +49,12 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         case noDrawing
     }
 
-    let selectedShapeLayer: CAShapeLayer = {
-        let shapeLayer = CAShapeLayer()
-        shapeLayer.strokeColor = UIColor.black.cgColor
-        shapeLayer.fillColor = UIColor.clear.cgColor
-        shapeLayer.lineWidth = 4
-        shapeLayer.lineDashPattern = [10, 5, 5, 5]
-        return shapeLayer
-    }()
-
-    lazy var deleteButton: UIButton = {
-        let button = UIButton()
-        button.frame.size = CGSize(width: 40, height: 40)
-        button.setImage(#imageLiteral(resourceName: "bin"), for: UIControl.State.normal)
-        button.addTarget(self, action: #selector(deleteButtonTapped), for: .touchUpInside)
-        return button
-    }()
-
-    @objc func deleteButtonTapped() {
-        resetUI()
-    }
-
-    func resetUI() {
-        saveButton.isEnabled = false
-        pinViewAdded?.removeFromSuperview()
-        selectedLayer?.removeFromSuperlayer()
-        removeAuxiliaryOverlays()
-        addedObject = nil
-        pinViewAdded = nil
-    }
-
+    
     // MARK: - Color Picker Controls
 
+    @IBOutlet var colorPickerStackView: UIStackView!
+    @IBOutlet var colorPickerBackgroundView: UIView!
+    
     @IBAction func changeColor(sender: AnyObject) {
         guard let button = sender as? UIButton else {
             return
@@ -178,7 +86,6 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         animateColorPicker()
     }
     
-     
     @IBOutlet var bottomColorButton: UIButton!
     @IBOutlet var colorPickerHeight: NSLayoutConstraint!
 
@@ -321,6 +228,71 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         }
     }
 
+    // MARK: - UI Logic
+
+    //FIXME: - scaling issues
+     lazy var imageSafeArea: CGRect = {
+            var safeArea = CGRect.zero
+         if  let size = imageView.image?.size {
+             let width = size.width
+             let height = size.height
+             safeArea = CGRect(x: width/50, y: height/50, width: width * 0.9, height: height * 0.9)
+        }
+           return safeArea
+     } ()
+     
+     var singleTapRecognizer: UITapGestureRecognizer!
+     var dragPanRecognizer: UIPanGestureRecognizer!
+     let notificationCenter = NotificationCenter.default
+
+     var currentLayer: CAShapeLayer?
+     var selectedLayer: CAShapeLayer?
+     var pinViewTapped: UIView?
+     var pinViewAdded: UIView?
+     var pinImage: UIView?
+     var handImageView = UIImageView()
+     var cornersImageView: [UIImageView] = []
+    
+    let selectedShapeLayer: CAShapeLayer = {
+        let shapeLayer = CAShapeLayer()
+        shapeLayer.strokeColor = UIColor.black.cgColor
+        shapeLayer.fillColor = UIColor.clear.cgColor
+        shapeLayer.lineWidth = 4
+        shapeLayer.lineDashPattern = [10, 5, 5, 5]
+        return shapeLayer
+    }()
+
+    lazy var deleteButton: UIButton = {
+        let button = UIButton()
+        button.frame.size = CGSize(width: 40, height: 40)
+        button.setImage(#imageLiteral(resourceName: "bin"), for: UIControl.State.normal)
+        button.addTarget(self, action: #selector(deleteButtonTapped), for: .touchUpInside)
+        return button
+    }()
+
+    @objc func deleteButtonTapped() {
+        resetUI()
+    }
+
+    func resetUI() {
+        saveButton.isEnabled = false
+        pinViewAdded?.removeFromSuperview()
+        selectedLayer?.removeFromSuperlayer()
+        removeAuxiliaryOverlays()
+        addedObject = nil
+        pinViewAdded = nil
+    }
+  
+    func configureStackViews() {
+        colorInfo = drawingColor.associatedColor.withAlphaComponent(1.0).htmlRGBaColor
+        bottomColorButton.layer.cornerRadius = 16
+        colorPickerBackgroundView.layer.cornerRadius = 22
+        colorPickerBackgroundView.layer.shadowColor = UIColor.gray.cgColor
+        colorPickerBackgroundView.layer.shadowOpacity = 0.8
+        colorPickerBackgroundView.layer.shadowOffset = .zero
+        colorPickerStackView.subviews.forEach { $0.layer.cornerRadius = 16 }
+    }
+    
         // MARK: - ***** VIEWDIDLOAD *****
     
     override func viewDidLoad() {
@@ -335,18 +307,12 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         updateMinZoomScaleForSize(view.bounds.size)
         // disable swipe back for now to fix bug
         navigationController?.interactivePopGestureRecognizer?.isEnabled = false
-        configureDrawingViews()
         // color picker
         configureStackViews()
        
         saveButton.title = "save"
         saveButton.isEnabled = false
-        
-        // Do any additional setup after loading the view.
-        controlView.layer.cornerRadius = 22
-        controlView.layer.borderColor = UIColor.lightGray.cgColor
-        controlView.layer.borderWidth = 0.3
-
+    
         let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(scrollViewDoubleTapped))
         doubleTapRecognizer.numberOfTapsRequired = 2
         scrollView.addGestureRecognizer(doubleTapRecognizer)
@@ -354,49 +320,67 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         singleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(singleTap))
         scrollView.addGestureRecognizer(singleTapRecognizer)
 
-        rotationPanRecognizer = UIPanGestureRecognizer(target: self, action: #selector(dragging))
-        rotationPanRecognizer.delegate = self
+        dragPanRecognizer = UIPanGestureRecognizer(target: self, action: #selector(dragging))
+        dragPanRecognizer.delegate = self
         imageView.isUserInteractionEnabled = true
-        imageView.addGestureRecognizer(rotationPanRecognizer) // pan tutup surmek
+        imageView.addGestureRecognizer(dragPanRecognizer) // pan tutup surmek
+    }
+ 
+   
+    // MARK: - Adding Pin
 
-        notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
-        notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+    func addTag(withLocation location: CGPoint, toPhoto photo: UIImageView) {
+        deleteButton.frame.origin = CGPoint(x: location.x - 17, y: location.y - 130)
+        imageView.addSubview(deleteButton)
+
+        let frame = CGRect(x: location.x - 20, y: location.y - 80, width: 80, height: 80)
+        let pinViewTapped = UIView(frame: frame)
+        pinViewTapped.isUserInteractionEnabled = true
+        let pinImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 40, height: 80))
+        let originalImage = #imageLiteral(resourceName: "pin.circle.fill")
+        let templateImage = originalImage.withRenderingMode(.alwaysTemplate)
+        pinImageView.image = templateImage
+        pinImageView.tintColor = drawingColor.associatedColor.withAlphaComponent(1.0)
+        pinImageView.tag = 4
+        pinViewTapped.addSubview(pinImageView)
+        pinImage = pinImageView
+   
+        pinViewTapped.tag = 2
+        photo.addSubview(pinViewTapped)
+        pinViewAdded = pinViewTapped
+        // recordId & recordTypeId will come from previous VC textfield.
+        vectorType = .PIN(point: location)
+        vectorData = VectorMetaData(color: colorInfo, iconUrl: "put pin URL here", recordId: "", recordTypeId: "")
     }
 
-    override func viewDidLayoutSubviews() {
-        // don't forget to do this....is critical.
-        currentLayer?.anchorPoint = CGPoint(x: 0, y: 0)
-    }
+    // MARK: - Image Picker
 
-    func configureDrawingViews() {
-        pinButton.setImage(#imageLiteral(resourceName: "pinSelected"), for: UIControl.State.selected)
-        rectButton.setImage(#imageLiteral(resourceName: "rectangleShapeSelected"), for: UIControl.State.selected)
-        ellipseButton.setImage(#imageLiteral(resourceName: "ellipseShapeSelected"), for: UIControl.State.selected)
-        pinButton.isSelected = true
-    }
-    
-    func configureStackViews() {
-        colorInfo = drawingColor.associatedColor.withAlphaComponent(1.0).htmlRGBaColor
-        bottomColorButton.layer.cornerRadius = 16
-        colorPickerBackgroundView.layer.cornerRadius = 22
-        colorPickerBackgroundView.layer.shadowColor = UIColor.gray.cgColor
-        colorPickerBackgroundView.layer.shadowOpacity = 0.8
-        colorPickerBackgroundView.layer.shadowOffset = .zero
-        colorPickerStackView.subviews.forEach { $0.layer.cornerRadius = 16 }
-    }
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+        guard let image = info[.editedImage] as? UIImage else { return }
 
-    @objc func adjustForKeyboard(notification: Notification) {
-        guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
+        dismiss(animated: true)
+        guard let pin = pinViewTapped else { return }
+        // remove old pin
+        pin.subviews.forEach({ if $0.tag == 4 { $0.removeFromSuperview() }})
+        pin.tag = 2
 
-        let keyboardScreenEndFrame = keyboardValue.cgRectValue
-        let keyboardViewEndFrame = view.convert(keyboardScreenEndFrame, from: view.window)
+        let frame = CGRect(x: 1, y: 20, width: 38, height: 50)
+        let cone = UIImageView(frame: frame)
+        cone.image = #imageLiteral(resourceName: "arrowtriangle.down.fill")
+        cone.tag = 3
+        pin.addSubview(cone)
 
-        if notification.name == UIResponder.keyboardWillHideNotification {
-            scrollView.contentInset = .zero
-        } else {
-            scrollView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: keyboardViewEndFrame.height - view.safeAreaInsets.bottom, right: 0)
-        }
-        scrollView.scrollIndicatorInsets = scrollView.contentInset
+        let circleImage = UIImageView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
+        circleImage.image = image
+        circleImage.layer.masksToBounds = false
+        circleImage.layer.cornerRadius = pin.frame.height / 2
+        circleImage.layer.borderWidth = 2
+        circleImage.layer.borderColor = UIColor.systemBlue.cgColor
+        circleImage.clipsToBounds = true
+        circleImage.tag = 4
+        pin.addSubview(circleImage)
+        imageView.bringSubviewToFront(pin)
+        pinViewTapped = nil
     }
 
     // MARK: - Helper method for drawing Shapes
@@ -583,63 +567,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         return thePath
     }
 
-    // MARK: - Adding Tag
-
-    func addTag(withLocation location: CGPoint, toPhoto photo: UIImageView) {
-        deleteButton.frame.origin = CGPoint(x: location.x - 17, y: location.y - 130)
-        imageView.addSubview(deleteButton)
-
-        let frame = CGRect(x: location.x - 20, y: location.y - 80, width: 80, height: 80)
-        let pinViewTapped = UIView(frame: frame)
-        pinViewTapped.isUserInteractionEnabled = true
-        let pinImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 40, height: 80))
-        let originalImage = #imageLiteral(resourceName: "pin.circle.fill")
-        let templateImage = originalImage.withRenderingMode(.alwaysTemplate)
-        pinImageView.image = templateImage
-        pinImageView.tintColor = drawingColor.associatedColor.withAlphaComponent(1.0)
-        pinImageView.tag = 4
-        pinViewTapped.addSubview(pinImageView)
-        pinImage = pinImageView
-   
-        pinViewTapped.tag = 2
-        photo.addSubview(pinViewTapped)
-        pinViewAdded = pinViewTapped
-        // recordId & recordTypeId will come from previous VC textfield.
-        vectorType = .PIN(point: location)
-        vectorData = VectorMetaData(color: colorInfo, iconUrl: "put pin URL here", recordId: recordId, recordTypeId: recordTypeId)
-    }
-
-    // MARK: - Image Picker
-
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-        guard let image = info[.editedImage] as? UIImage else { return }
-
-        dismiss(animated: true)
-        guard let pin = pinViewTapped else { return }
-        // remove old pin
-        pin.subviews.forEach({ if $0.tag == 4 { $0.removeFromSuperview() }})
-        pin.tag = 2
-
-        let frame = CGRect(x: 1, y: 20, width: 38, height: 50)
-        let cone = UIImageView(frame: frame)
-        cone.image = #imageLiteral(resourceName: "arrowtriangle.down.fill")
-        cone.tag = 3
-        pin.addSubview(cone)
-
-        let circleImage = UIImageView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
-        circleImage.image = image
-        circleImage.layer.masksToBounds = false
-        circleImage.layer.cornerRadius = pin.frame.height / 2
-        circleImage.layer.borderWidth = 2
-        circleImage.layer.borderColor = UIColor.systemBlue.cgColor
-        circleImage.clipsToBounds = true
-        circleImage.tag = 4
-        pin.addSubview(circleImage)
-        imageView.bringSubviewToFront(pin)
-        pinViewTapped = nil
-    }
-
-    // MARK: - Tapping Tag
+    // MARK: - Single Tap Logic
 
     @objc func singleTap(gesture: UIRotationGestureRecognizer) {
         let touchPoint = singleTapRecognizer.location(in: imageView)
@@ -721,11 +649,11 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
               case .drawRect:
                 saveButton.isEnabled = true
                 vectorType = .PATH(points: cornerPoints)
-                 vectorData = VectorMetaData(color: colorInfo, iconUrl: "put Rect URL here", recordId: recordId, recordTypeId: recordTypeId)
+                 vectorData = VectorMetaData(color: colorInfo, iconUrl: "put Rect URL here", recordId: "", recordTypeId: "")
                case .drawEllipse:
                 saveButton.isEnabled = true
                 vectorType = .ELLIPSE(points: cornerPoints)
-                 vectorData = VectorMetaData(color: colorInfo, iconUrl: "put Ellipse url here", recordId: recordId, recordTypeId: recordTypeId)
+                 vectorData = VectorMetaData(color: colorInfo, iconUrl: "put Ellipse url here", recordId: "", recordTypeId: "")
               
             default:
                 print("Sth is wrong!")
@@ -739,7 +667,8 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         selectedShapeLayer.path = nil
         
   }
-    // MARK: - Rotation logic
+    
+    // MARK: - Drag logic
 
     enum cornerPoint {
         // corners selected
@@ -779,7 +708,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
             if colorPickerHeight.constant == 288 {
                 shrinkColorPicker()
             }
-            panStartPoint = rotationPanRecognizer.location(in: imageView)
+            panStartPoint = dragPanRecognizer.location(in: imageView)
              
             // define in which corner we are: (default is no corners)
             let positions = [cornerPoint.leftTop, cornerPoint.leftBottom, cornerPoint.rightBottom, cornerPoint.rightTop]
@@ -820,7 +749,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
             print("&&&&&&&  TOUCHING")
             print(corner)
 
-            let currentPoint = rotationPanRecognizer.location(in: imageView)
+            let currentPoint = dragPanRecognizer.location(in: imageView)
            
             if  !imageSafeArea.contains(currentPoint) {
                   resetDrag()
@@ -852,15 +781,15 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
             
             case .dropPin:
                 vectorType = .PIN(point: touchedPoint)
-                vectorData = VectorMetaData(color: colorInfo, iconUrl: "put pin URL here", recordId: recordId, recordTypeId: recordTypeId)
+                vectorData = VectorMetaData(color: colorInfo, iconUrl: "put pin URL here", recordId: "", recordTypeId: "")
               
             case .drawRect:
                 vectorType = .PATH(points: cornerArray)
-                vectorData = VectorMetaData(color: colorInfo, iconUrl: "put Rect URL here", recordId: recordId, recordTypeId: recordTypeId)
+                vectorData = VectorMetaData(color: colorInfo, iconUrl: "put Rect URL here", recordId: "", recordTypeId: "")
                
             case .drawEllipse:
                 vectorType = .ELLIPSE(points: cornerArray)
-                vectorData = VectorMetaData(color: colorInfo, iconUrl: "put Ellipse URL here", recordId: recordId, recordTypeId: recordTypeId)
+                vectorData = VectorMetaData(color: colorInfo, iconUrl: "put Ellipse URL here", recordId: "", recordTypeId: "")
                 
             default:
                 print("Sth is wrong!")
@@ -948,6 +877,20 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
 
     // MARK: - ScrollView zoom, drag etc
 
+    @IBOutlet var scrollView: UIScrollView!
+    @IBOutlet var imageView: UIImageView!
+    
+    @IBOutlet var imageViewBottomConstraint: NSLayoutConstraint!
+    @IBOutlet var imageViewLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet var imageViewTopConstraint: NSLayoutConstraint!
+    @IBOutlet var imageViewTrailingConstraint: NSLayoutConstraint!
+    
+    
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                           shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
+    }
+    
     func updateMinZoomScaleForSize(_ size: CGSize) {
         let widthScale = size.width / imageView.bounds.width
         let heightScale = size.height / imageView.bounds.height

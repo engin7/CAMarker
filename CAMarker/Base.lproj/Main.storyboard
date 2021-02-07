@@ -214,17 +214,18 @@
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="y6y-h2-ntD">
                                         <rect key="frame" x="331" y="30" width="44" height="128"/>
                                         <subviews>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7x9-pb-2Pf">
+                                            <button opaque="NO" tag="2" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7x9-pb-2Pf">
                                                 <rect key="frame" x="6" y="88" width="32" height="32"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="32" id="HYv-uv-BFE"/>
                                                 </constraints>
                                                 <state key="normal" title="Button" image="ellipseShape"/>
+                                                <state key="selected" image="ellipseShapeSelected"/>
                                                 <connections>
-                                                    <action selector="ellipseButtonPressed:" destination="jvl-BP-SOu" eventType="touchUpInside" id="VvA-GC-Aat"/>
+                                                    <action selector="changeDrawWithButton:" destination="jvl-BP-SOu" eventType="touchUpInside" id="1hJ-HC-47W"/>
                                                 </connections>
                                             </button>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="R5I-I5-GLe">
+                                            <button opaque="NO" tag="1" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="R5I-I5-GLe">
                                                 <rect key="frame" x="6" y="48" width="32" height="32"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="32" id="nXd-lM-tK4"/>
@@ -232,18 +233,20 @@
                                                 <state key="normal" title="Button" image="rectangleShape">
                                                     <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
                                                 </state>
+                                                <state key="selected" image="rectangleShapeSelected"/>
                                                 <connections>
-                                                    <action selector="rectButtonPressed:" destination="jvl-BP-SOu" eventType="touchUpInside" id="mby-yX-uAp"/>
+                                                    <action selector="changeDrawWithButton:" destination="jvl-BP-SOu" eventType="touchUpInside" id="j86-OP-VMa"/>
                                                 </connections>
                                             </button>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="M0W-Ae-ZAw">
+                                            <button opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="M0W-Ae-ZAw">
                                                 <rect key="frame" x="6" y="8" width="32" height="32"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="32" id="hnT-b7-XVl"/>
                                                 </constraints>
                                                 <state key="normal" title="Button" image="pin"/>
+                                                <state key="selected" image="pinSelected"/>
                                                 <connections>
-                                                    <action selector="pinButtonPressed:" destination="jvl-BP-SOu" eventType="touchUpInside" id="z1s-gp-Z4C"/>
+                                                    <action selector="changeDrawWithButton:" destination="jvl-BP-SOu" eventType="touchUpInside" id="ijH-xo-YBt"/>
                                                 </connections>
                                             </button>
                                         </subviews>
@@ -267,11 +270,12 @@
                                 <constraints>
                                     <constraint firstItem="hca-YP-t1e" firstAttribute="leading" secondItem="AZZ-rn-riT" secondAttribute="leading" id="0Ww-d4-YZU"/>
                                     <constraint firstItem="hca-YP-t1e" firstAttribute="trailing" secondItem="AZZ-rn-riT" secondAttribute="trailing" id="2Me-Yd-aXA"/>
-                                    <constraint firstItem="hca-YP-t1e" firstAttribute="width" secondItem="FiR-I5-lfo" secondAttribute="width" multiplier="0.950886" constant="18.417750000000012" placeholder="YES" id="574-wb-Lzv"/>
-                                    <constraint firstItem="hca-YP-t1e" firstAttribute="bottom" secondItem="AZZ-rn-riT" secondAttribute="bottom" constant="-77" id="8GN-ih-i6S"/>
+                                    <constraint firstItem="hca-YP-t1e" firstAttribute="bottom" secondItem="AZZ-rn-riT" secondAttribute="bottom" id="8GN-ih-i6S"/>
                                     <constraint firstItem="FiR-I5-lfo" firstAttribute="trailing" secondItem="ih2-Wx-0wt" secondAttribute="trailing" constant="6" id="FCX-p0-X9d"/>
                                     <constraint firstItem="FiR-I5-lfo" firstAttribute="trailing" secondItem="y6y-h2-ntD" secondAttribute="trailing" id="Gee-fc-ajk"/>
+                                    <constraint firstItem="hca-YP-t1e" firstAttribute="height" secondItem="FiR-I5-lfo" secondAttribute="height" id="Guo-2x-Kry"/>
                                     <constraint firstItem="y6y-h2-ntD" firstAttribute="top" secondItem="FiR-I5-lfo" secondAttribute="top" constant="30" id="HnC-Jw-0gl"/>
+                                    <constraint firstItem="hca-YP-t1e" firstAttribute="width" secondItem="FiR-I5-lfo" secondAttribute="width" id="Upr-pf-vce"/>
                                     <constraint firstItem="i3h-ew-3Ui" firstAttribute="trailing" secondItem="FiR-I5-lfo" secondAttribute="trailing" id="XOS-f9-ano"/>
                                     <constraint firstItem="FiR-I5-lfo" firstAttribute="bottom" secondItem="i3h-ew-3Ui" secondAttribute="bottom" constant="24" id="pxX-fR-gF9"/>
                                     <constraint firstItem="hca-YP-t1e" firstAttribute="top" secondItem="AZZ-rn-riT" secondAttribute="top" id="tdT-26-Nfk"/>
@@ -303,17 +307,13 @@
                     <connections>
                         <outlet property="bottomColorButton" destination="GdR-Uy-Qla" id="zke-kf-3JH"/>
                         <outlet property="colorPickerBackgroundView" destination="i3h-ew-3Ui" id="Gnb-iI-hyz"/>
-                        <outlet property="colorPickerHeight" destination="jvg-SD-iWd" id="CUp-SZ-9ne"/>
+                        <outlet property="colorPickerHeight" destination="YjD-hm-H3A" id="e01-mK-2mX"/>
                         <outlet property="colorPickerStackView" destination="cEG-MQ-iiD" id="1za-O5-1qA"/>
-                        <outlet property="controlView" destination="y6y-h2-ntD" id="qd0-aE-XhS"/>
-                        <outlet property="ellipseButton" destination="7x9-pb-2Pf" id="fdQ-2v-Ecd"/>
                         <outlet property="imageView" destination="hca-YP-t1e" id="5Jr-ga-xPl"/>
                         <outlet property="imageViewBottomConstraint" destination="8GN-ih-i6S" id="ru5-yG-Rtv"/>
                         <outlet property="imageViewLeadingConstraint" destination="0Ww-d4-YZU" id="Rts-NI-AXP"/>
                         <outlet property="imageViewTopConstraint" destination="tdT-26-Nfk" id="ZLL-Ju-Vbg"/>
                         <outlet property="imageViewTrailingConstraint" destination="2Me-Yd-aXA" id="QLo-7d-sl9"/>
-                        <outlet property="pinButton" destination="M0W-Ae-ZAw" id="TWv-6s-CoX"/>
-                        <outlet property="rectButton" destination="R5I-I5-GLe" id="g88-fY-PrI"/>
                         <outlet property="saveButton" destination="zXi-KN-lFK" id="eF8-fY-wEn"/>
                         <outlet property="scrollView" destination="fqS-eq-g0o" id="gQ2-4m-nAe"/>
                     </connections>
@@ -345,11 +345,14 @@
         <image name="blue" width="44" height="44"/>
         <image name="cyan" width="44" height="44"/>
         <image name="ellipseShape" width="44" height="44"/>
+        <image name="ellipseShapeSelected" width="44" height="44"/>
         <image name="green" width="44" height="44"/>
         <image name="magenta" width="44" height="44"/>
         <image name="orange" width="44" height="44"/>
         <image name="pin" width="44" height="44"/>
+        <image name="pinSelected" width="44" height="44"/>
         <image name="rectangleShape" width="44" height="44"/>
+        <image name="rectangleShapeSelected" width="44" height="44"/>
         <image name="red" width="44" height="44"/>
         <image name="yellow" width="44" height="44"/>
         <systemColor name="systemBackgroundColor">
