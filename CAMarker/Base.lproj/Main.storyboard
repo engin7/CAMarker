@@ -116,6 +116,9 @@
                                                             <constraint firstAttribute="height" constant="32" id="Cqj-Of-9er"/>
                                                         </constraints>
                                                         <state key="normal" title="Button" image="magenta"/>
+                                                        <connections>
+                                                            <action selector="changeColorWithSender:" destination="jvl-BP-SOu" eventType="touchUpInside" id="wdR-v5-EnI"/>
+                                                        </connections>
                                                     </button>
                                                     <button opaque="NO" tag="5" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="l6V-F7-NnX">
                                                         <rect key="frame" x="0.0" y="40" width="32" height="32"/>
@@ -125,6 +128,9 @@
                                                         <state key="normal" title="Button" image="yellow">
                                                             <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
                                                         </state>
+                                                        <connections>
+                                                            <action selector="changeColorWithSender:" destination="jvl-BP-SOu" eventType="touchUpInside" id="8jG-mI-w74"/>
+                                                        </connections>
                                                     </button>
                                                     <button opaque="NO" tag="4" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5Dy-sd-Z4m">
                                                         <rect key="frame" x="0.0" y="80" width="32" height="32"/>
@@ -132,6 +138,9 @@
                                                             <constraint firstAttribute="height" constant="32" id="ebE-Tu-fWE"/>
                                                         </constraints>
                                                         <state key="normal" title="Button" image="cyan"/>
+                                                        <connections>
+                                                            <action selector="changeColorWithSender:" destination="jvl-BP-SOu" eventType="touchUpInside" id="TDS-LP-1MI"/>
+                                                        </connections>
                                                     </button>
                                                     <button opaque="NO" tag="3" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Mta-1b-kyQ">
                                                         <rect key="frame" x="0.0" y="120" width="32" height="32"/>
@@ -139,6 +148,9 @@
                                                             <constraint firstAttribute="height" constant="32" id="5Zi-4S-TNk"/>
                                                         </constraints>
                                                         <state key="normal" title="Button" image="green"/>
+                                                        <connections>
+                                                            <action selector="changeColorWithSender:" destination="jvl-BP-SOu" eventType="touchUpInside" id="klI-1V-Dsf"/>
+                                                        </connections>
                                                     </button>
                                                     <button opaque="NO" tag="2" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="REX-nS-Ff0">
                                                         <rect key="frame" x="0.0" y="160" width="32" height="32"/>
@@ -148,6 +160,9 @@
                                                         <state key="normal" title="Button" image="orange">
                                                             <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
                                                         </state>
+                                                        <connections>
+                                                            <action selector="changeColorWithSender:" destination="jvl-BP-SOu" eventType="touchUpInside" id="efd-gD-fNB"/>
+                                                        </connections>
                                                     </button>
                                                     <button opaque="NO" tag="1" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="d51-34-sDI">
                                                         <rect key="frame" x="0.0" y="200" width="32" height="32"/>
@@ -155,6 +170,9 @@
                                                             <constraint firstAttribute="height" constant="32" id="e4Z-Vy-r1l"/>
                                                         </constraints>
                                                         <state key="normal" title="Button" image="red"/>
+                                                        <connections>
+                                                            <action selector="changeColorWithSender:" destination="jvl-BP-SOu" eventType="touchUpInside" id="aRe-kA-kVq"/>
+                                                        </connections>
                                                     </button>
                                                 </subviews>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -181,6 +199,9 @@
                                                     <constraint firstAttribute="height" constant="32" id="8BN-SR-tPt"/>
                                                 </constraints>
                                                 <state key="normal" title="Button" image="blue"/>
+                                                <connections>
+                                                    <action selector="changeColorWithSender:" destination="jvl-BP-SOu" eventType="touchUpInside" id="Dqw-vv-Y6b"/>
+                                                </connections>
                                             </button>
                                         </subviews>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

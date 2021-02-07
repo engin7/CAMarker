@@ -147,58 +147,38 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
 
     // MARK: - Color Picker Controls
 
-    @IBAction func magentaTapped(_ sender: Any) {
-        drawingColor = drawColor.magenta
-        pinImage?.tintColor = drawingColor.associatedColor.withAlphaComponent(1.0)
-        selectedLayer?.fillColor? = drawingColor.associatedColor.cgColor
-        animateColorPicker()
-    }
-
-    @IBAction func yellowTapped(_ sender: UIButton) {
-        drawingColor = drawColor.yellow
-        pinImage?.tintColor = drawingColor.associatedColor.withAlphaComponent(1.0)
-        selectedLayer?.fillColor? = drawingColor.associatedColor.cgColor
-        animateColorPicker()
-    }
-
-    @IBAction func cyanTapped(_ sender: Any) {
-        drawingColor = drawColor.cyan
-        pinImage?.tintColor = drawingColor.associatedColor.withAlphaComponent(1.0)
-        selectedLayer?.fillColor? = drawingColor.associatedColor.cgColor
-        animateColorPicker()
-    }
-
-    @IBAction func greenTapped(_ sender: Any) {
-        drawingColor = drawColor.green
-        pinImage?.tintColor = drawingColor.associatedColor.withAlphaComponent(1.0)
-        selectedLayer?.fillColor? = drawingColor.associatedColor.cgColor
-        animateColorPicker()
-    }
-
-    @IBAction func orangeTapped(_ sender: Any) {
-        drawingColor = drawColor.orange
-        pinImage?.tintColor = drawingColor.associatedColor.withAlphaComponent(1.0)
-        selectedLayer?.fillColor? = drawingColor.associatedColor.cgColor
-        animateColorPicker()
-    }
-
-    @IBAction func redTapped(_ sender: Any) {
-        drawingColor = drawColor.red
-        pinImage?.tintColor = drawingColor.associatedColor.withAlphaComponent(1.0)
-        selectedLayer?.fillColor? = drawingColor.associatedColor.cgColor
-        animateColorPicker()
-    }
-
-    // Bottom button
-    @IBAction func blueTapped(_ sender: Any) {
-        if !colorPickerStackView.isHidden {
-            drawingColor = drawColor.blue
+    @IBAction func changeColor(sender: AnyObject) {
+        guard let button = sender as? UIButton else {
+            return
+        }
+        switch button.tag {
+        case 0:
+            if !colorPickerStackView.isHidden {
+                drawingColor = drawColor.blue
+            }
+        case 1:
+            drawingColor = drawColor.red
+          
+        case 2:
+            drawingColor = drawColor.orange
+        case 3:
+            drawingColor = drawColor.green
+        case 4:
+            drawingColor = drawColor.cyan
+        case 5:
+            drawingColor = drawColor.yellow
+        case 6:
+            drawingColor = drawColor.magenta
+        default:
+            print("Unknown color")
+            return
         }
         pinImage?.tintColor = drawingColor.associatedColor.withAlphaComponent(1.0)
         selectedLayer?.fillColor? = drawingColor.associatedColor.cgColor
         animateColorPicker()
     }
-
+    
+     
     @IBOutlet var bottomColorButton: UIButton!
     @IBOutlet var colorPickerHeight: NSLayoutConstraint!
 
