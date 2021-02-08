@@ -31,6 +31,18 @@ extension CGRect {
 
 extension CGPoint {
  
+     func drawPin() -> UIBezierPath {
+        let thePath = UIBezierPath()
+        thePath.move(to: self)
+        let lineEnd = CGPoint(x: self.x, y: self.y - 30)
+        thePath.addLine(to: lineEnd)
+        let center = CGPoint(x: lineEnd.x, y: lineEnd.y-10)
+        thePath.addArc(withCenter: center, radius: 10, startAngle: CGFloat.pi/2, endAngle: (5/2) * CGFloat.pi, clockwise: true)
+        return thePath
+    }
+    
+ 
+    
     func distance(to point: CGPoint) -> CGFloat {
         return sqrt(pow(x - point.x, 2) + pow(y - point.y, 2))
     }
@@ -55,6 +67,36 @@ extension CGPoint {
 }
 
 extension Array where Element == CGPoint {
+    
+    func drawRect() -> UIBezierPath {
+        let thePath = UIBezierPath()
+        thePath.move(to: self[0])
+        for i in 1...3 {
+            thePath.addLine(to: self[i])
+        }
+        thePath.close()
+        return thePath
+    }
+    
+    func drawEllipse() -> UIBezierPath {
+         
+        let w = self[2].distance(to: self[1])
+        let h = self[1].distance(to: self[0])
+
+        var frame = CGRect()
+        if self[0].x < self[3].x && self[0].y < self[1].y {
+            frame = CGRect(x: self[0].x, y: self[0].y, width: w, height: h)
+        } else if self[0].y > self[1].y && self[0].x > self[3].x {
+            frame = CGRect(x: self[2].x, y: self[2].y, width: w, height: h)
+        } else if self[0].x > self[3].x {
+            frame = CGRect(x: self[3].x, y: self[3].y, width: w, height: h)
+        } else if self[0].y > self[1].y {
+            frame = CGRect(x: self[1].x, y: self[1].y, width: w, height: h)
+        }
+
+        let radii = Swift.min(frame.height, frame.width)
+        return UIBezierPath(roundedRect: frame, cornerRadius: radii)
+    }
     
     func centroid() -> CGPoint? {
         

@@ -78,8 +78,7 @@ import UIKit
 
     @objc func singleTap(gesture: UIRotationGestureRecognizer) {
         let touchPoint = singleTapRecognizer.location(in: imageView)
-       
-       
+        
        
   }
     

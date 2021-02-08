@@ -344,9 +344,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
                 return UIBezierPath()
         }
     }
-    
-   
-    
+     
     private func addCornerPoints(_ corners: [CGPoint], distance: CGFloat) {
             let layer = CAShapeLayer()
             layer.strokeColor = UIColor(ciColor: .blue).cgColor
@@ -368,7 +366,6 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
     }
   
     private func modifyShape(_ corner: cornerPoint, _ withShift: (x: CGFloat, y: CGFloat)) -> UIBezierPath {
-        let thePath = UIBezierPath()
         var cornersArray: [CGPoint] = [CGPoint.zero,CGPoint.zero,CGPoint.zero,CGPoint.zero]
         var point = CGPoint.zero
          switch initialVectorType  {
@@ -428,18 +425,9 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
             thirdLine = shiftedRightTop
         }
         
-        thePath.move(to: movePoint)
-        thePath.addLine(to: firstLine)
-        thePath.addLine(to: secondLine)
-        thePath.addLine(to: thirdLine)
-        thePath.close()
- 
-        // save points
-        cornersArray.append(movePoint)
-        cornersArray.append(firstLine)
-        cornersArray.append(secondLine)
-        cornersArray.append(thirdLine)
-       
+        cornersArray = [movePoint, firstLine, secondLine, thirdLine]
+        let thePath = cornersArray.drawRect()
+         
         var ellipsePath = UIBezierPath()
         if drawingMode == .drawEllipse {
             let leftTop = cornersArray[0]
@@ -479,30 +467,8 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
                 rb = rightBottom
                 rt = rightTop
             }
-
-            let w = rb.distance(to: lb)
-            let h = lb.distance(to: lt)
-
-            var frame = CGRect()
-            if lt.x < rt.x && lt.y < lb.y {
-                frame = CGRect(x: lt.x, y: lt.y, width: w, height: h)
-            } else if lt.y > lb.y && lt.x > rt.x {
-                frame = CGRect(x: rb.x, y: rb.y, width: w, height: h)
-            } else if lt.x > rt.x {
-                frame = CGRect(x: rt.x, y: rt.y, width: w, height: h)
-            } else if lt.y > lb.y {
-                frame = CGRect(x: lb.x, y: lb.y, width: w, height: h)
-            }
-
-            let radii = min(frame.height, frame.width)
-            ellipsePath = UIBezierPath(roundedRect: frame, cornerRadius: radii)
-            cornersArray = []
-
-            // save points
-            cornersArray.append(lt)
-            cornersArray.append(lb)
-            cornersArray.append(rb)
-            cornersArray.append(rt)
+            cornersArray = [lt,lb,rb,rt]
+            ellipsePath = cornersArray.drawEllipse()
         }
  
         // Save to Model. Update as dragging moved locations.
