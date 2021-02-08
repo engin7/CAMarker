@@ -297,7 +297,8 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
     
         scrollView.minimumZoomScale = 0.1
         scrollView.maximumZoomScale = 5.0
-        
+        updateMinZoomScaleForSize(view.bounds.size)
+
         let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(scrollViewDoubleTapped))
         doubleTapRecognizer.numberOfTapsRequired = 2
         scrollView.addGestureRecognizer(doubleTapRecognizer)
@@ -675,12 +676,8 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
                            shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
     }
-    
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-        updateMinZoomScaleForSize(view.bounds.size)
-    }
-  }
+ 
+   }
 extension MarkerInsertViewController: UIScrollViewDelegate {
 
     func updateMinZoomScaleForSize(_ size: CGSize) {
