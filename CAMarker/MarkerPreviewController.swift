@@ -14,7 +14,15 @@ import UIKit
      var markerDict: [(LayoutMapData,CAShapeLayer)] = []
      private var plotView: UIImageView?
      var singleTapRecognizer: UITapGestureRecognizer!
-
+    
+     var currentShapeLayer: CAShapeLayer = {
+        let shapeLayer = CAShapeLayer()
+        shapeLayer.strokeColor = UIColor.black.cgColor
+        shapeLayer.fillColor = UIColor.clear.cgColor
+         shapeLayer.lineWidth = 2
+        return shapeLayer
+     }()
+    
      private let imageView: UIImageView = {
          let iv = UIImageView(frame: .zero)
          iv.translatesAutoresizingMaskIntoConstraints = false
@@ -93,7 +101,7 @@ import UIKit
              guard let context = UIGraphicsGetCurrentContext() else {
                  return
              }
-             
+             // TODO: - change this to UIBezierPath
              for marker in markers {
                  let markerColor = UIColor(ciColor: .red)
                  switch marker.vector {
@@ -134,7 +142,7 @@ import UIKit
                      context.closePath()
                      context.drawPath(using: .fillStroke)
                      context.restoreGState()
-
+                        
                      context.saveGState()
                      context.setFillColor(markerColor.cgColor)
                      for pin in points {

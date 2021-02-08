@@ -378,7 +378,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
             default:
               print("")
         }
-        
+        // TODO: Refactor this later
         let leftTop = cornersArray[0]
         let leftBottom = cornersArray[1]
         let rightBottom = cornersArray[2]
@@ -644,16 +644,14 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
                            shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
     }
- 
    }
+
 extension MarkerInsertViewController: UIScrollViewDelegate {
 
-    
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
         updateConstraintsForSize()
     }
-   
-    
+
     func updateConstraintsForSize() {
       if let image = imageView.image {
         let imageWidth = image.size.width
@@ -690,7 +688,6 @@ extension MarkerInsertViewController: UIScrollViewDelegate {
         scrollView.minimumZoomScale = 0.3 * minZoom
  
         scrollView.zoomScale = minZoom
-       
       }
     }
     
@@ -709,11 +706,8 @@ extension MarkerInsertViewController: UIScrollViewDelegate {
           let h = scrollViewSize.height / newZoomScale
           let x = pointInView.x - (w / 2.0)
           let y = pointInView.y - (h / 2.0)
-
           let rectToZoomTo = CGRect(x: x, y: y, width: w, height: h)
-
           scrollView.zoom(to: rectToZoomTo, animated: true)
       }
-    
 }
  
