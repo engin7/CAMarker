@@ -11,8 +11,10 @@ import UIKit
   
      var layoutUrl: String?
      var markers: [LayoutMapData] = []
+     var markerDict: [(LayoutMapData,CAShapeLayer)] = []
      private var plotView: UIImageView?
-   
+     var singleTapRecognizer: UITapGestureRecognizer!
+
      private let imageView: UIImageView = {
          let iv = UIImageView(frame: .zero)
          iv.translatesAutoresizingMaskIntoConstraints = false
@@ -36,6 +38,8 @@ import UIKit
                 put(markers)
             }
         })
+        singleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(singleTap))
+        imageView.addGestureRecognizer(singleTapRecognizer)
         
     }
      
@@ -43,6 +47,7 @@ import UIKit
          fatalError("init(coder:) has not been implemented")
      }
       
+    
      private let loaderView: UIActivityIndicatorView = {
          let indicator = UIActivityIndicatorView(style: .gray)
          indicator.translatesAutoresizingMaskIntoConstraints = false
@@ -69,6 +74,17 @@ import UIKit
            plotMarkers()
      }
   
+    // MARK: - Single Tap Logic
+
+    @objc func singleTap(gesture: UIRotationGestureRecognizer) {
+        let touchPoint = singleTapRecognizer.location(in: imageView)
+       
+       
+       
+  }
+    
+    // MARK: - Draw items
+    
      fileprivate func plotMarkers() {
         if let image = imageView.image, image.size.width >= 100, image.size.height >= 100 {
              let clippedFrame = imageView.contentClippingRect // *This return us image's frame inside imageView

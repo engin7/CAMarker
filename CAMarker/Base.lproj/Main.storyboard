@@ -31,13 +31,13 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="marker info" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YJW-t1-ner">
-                                <rect key="frame" x="8" y="172" width="359" height="21"/>
+                                <rect key="frame" x="8" y="194" width="359" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="opr-RZ-7fY">
-                                <rect key="frame" x="91.5" y="225" width="192" height="34"/>
+                                <rect key="frame" x="91.5" y="295" width="192" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                 <state key="normal" title="open Preview Controller"/>
                                 <connections>
@@ -45,7 +45,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hSL-Ug-DeH">
-                                <rect key="frame" x="86" y="291" width="203" height="34"/>
+                                <rect key="frame" x="86" y="369" width="203" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                 <state key="normal" title="search preview controller"/>
                                 <connections>
@@ -57,17 +57,16 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="YJW-t1-ner" secondAttribute="trailing" constant="8" id="9cE-sG-018"/>
-                            <constraint firstItem="opr-RZ-7fY" firstAttribute="top" secondItem="YJW-t1-ner" secondAttribute="bottom" constant="32" id="9fq-jm-hOI"/>
+                            <constraint firstItem="opr-RZ-7fY" firstAttribute="top" secondItem="YJW-t1-ner" secondAttribute="bottom" constant="80" id="9fq-jm-hOI"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="0Cn-eQ-QMw" secondAttribute="trailing" constant="8" id="APg-u2-6kp"/>
                             <constraint firstItem="opr-RZ-7fY" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="BOE-s6-3bc"/>
                             <constraint firstItem="YJW-t1-ner" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="8" id="EJ9-FL-CdP"/>
                             <constraint firstItem="0Cn-eQ-QMw" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="8" id="FeO-de-D22"/>
-                            <constraint firstItem="hSL-Ug-DeH" firstAttribute="top" secondItem="opr-RZ-7fY" secondAttribute="bottom" constant="32" id="H6s-tX-SGV"/>
-                            <constraint firstItem="YJW-t1-ner" firstAttribute="top" secondItem="HRD-fz-aEg" secondAttribute="bottom" constant="8" symbolic="YES" id="eHd-pA-qrX"/>
+                            <constraint firstItem="hSL-Ug-DeH" firstAttribute="top" secondItem="opr-RZ-7fY" secondAttribute="bottom" constant="40" id="H6s-tX-SGV"/>
                             <constraint firstItem="HRD-fz-aEg" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="jmQ-bC-rh8"/>
                             <constraint firstItem="HRD-fz-aEg" firstAttribute="top" secondItem="0Cn-eQ-QMw" secondAttribute="bottom" constant="32" id="kaA-I4-vhJ"/>
                             <constraint firstItem="hSL-Ug-DeH" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="lxU-MC-Bpv"/>
-                            <constraint firstItem="YJW-t1-ner" firstAttribute="top" secondItem="HRD-fz-aEg" secondAttribute="bottom" constant="8" symbolic="YES" id="pxO-3G-DCY"/>
+                            <constraint firstItem="YJW-t1-ner" firstAttribute="top" secondItem="HRD-fz-aEg" secondAttribute="bottom" constant="30" id="pxO-3G-DCY"/>
                             <constraint firstItem="0Cn-eQ-QMw" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="20" id="u51-ns-6Mo"/>
                         </constraints>
                     </view>

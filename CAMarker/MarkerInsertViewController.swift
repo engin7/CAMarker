@@ -333,7 +333,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         
         switch mode {
             case .dropPin:
-                return drawPin(touch)
+                return touch.drawPin()
             case .drawRect:
                 addCornerPoints(corners,distance:scale)
                 return UIBezierPath(rect: frame)
@@ -345,15 +345,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         }
     }
     
-    private func drawPin(_ touch: CGPoint) -> UIBezierPath {
-        let thePath = UIBezierPath()
-        thePath.move(to: touch)
-        let lineEnd = CGPoint(x: touch.x, y: touch.y - 30)
-        thePath.addLine(to: lineEnd)
-        let center = CGPoint(x: lineEnd.x, y: lineEnd.y-10)
-        thePath.addArc(withCenter: center, radius: 10, startAngle: CGFloat.pi/2, endAngle: (5/2) * CGFloat.pi, clockwise: true)
-        return thePath
-    }
+   
     
     private func addCornerPoints(_ corners: [CGPoint], distance: CGFloat) {
             let layer = CAShapeLayer()
@@ -520,7 +512,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
             let p = CGPoint(x: point.x + withShift.x, y: point.y + withShift.y)
             vectorType = .PIN(point: p)
             vectorData = VectorMetaData(color: colorInfo, iconUrl: "put pin URL here", recordId: "", recordTypeId: "")
-            return drawPin(p)
+            return p.drawPin()
         case .drawRect:
             currentShapeLayer.sublayers?.forEach {$0.removeFromSuperlayer()}
             deleteButton.removeFromSuperview()
@@ -552,9 +544,9 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
             shrinkColorPicker()
            }
  
-            // No shape selected or added so add new one
-            if currentShapeLayer.superlayer != imageView.layer && drawingMode != .noDrawing  {
-            // draw rectangle, ellipse etc according to selection
+                // No shape selected or added so add new one
+                if currentShapeLayer.superlayer != imageView.layer && drawingMode != .noDrawing  {
+                // draw rectangle, ellipse etc according to selection
                 currentShapeLayer.fillColor? = drawingColor.associatedColor.cgColor
                 let path = drawShape(touch: touchPoint, mode: drawingMode)
                 currentShapeLayer.path = path.cgPath
@@ -641,7 +633,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
                   
                 }
             }
-         }
+         }	
             touchedPoint = panStartPoint // to offset reference
         if gesture.state == UIGestureRecognizer.State.changed && initialVectorType != nil {
             // we're inside selection
