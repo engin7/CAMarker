@@ -17,7 +17,7 @@ import UIKit
          let iv = UIImageView(frame: .zero)
          iv.translatesAutoresizingMaskIntoConstraints = false
          iv.contentMode = .scaleAspectFit
-         iv.backgroundColor = .systemPink
+         iv.backgroundColor = .clear
          return iv
      }()
      

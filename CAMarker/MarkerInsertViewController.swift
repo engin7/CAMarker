@@ -294,7 +294,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         super.viewDidLoad()
  
         // Download image from URL
-        imageView.loadImageUsingCache(urlString: inputBundle?.layoutUrl ?? "", completion: {_ in })
+        imageView.loadImageUsingCache(urlString: inputBundle?.layoutUrl ?? "", completion: {_ in  self.updateZoom() })
         
          // disable swipe back for now to fix bug
         navigationController?.interactivePopGestureRecognizer?.isEnabled = false
@@ -317,13 +317,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         dragPanRecognizer.delegate = self
         imageView.isUserInteractionEnabled = true
         imageView.addGestureRecognizer(dragPanRecognizer) // pan tutup surmek
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            self.updateZoom()
-
-            
-        }
-        
+         
     }
  
      

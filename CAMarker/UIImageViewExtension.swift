@@ -12,9 +12,7 @@ extension UIImageView {
     func loadImageUsingCache(urlString : String, completion: @escaping CompletionHandler) {
         
         guard let url =  URL(string: urlString) else { return}
-        
-      
-        
+         
         let activityIndicator: UIActivityIndicatorView = UIActivityIndicatorView.init()
         addSubview(activityIndicator)
         activityIndicator.startAnimating()
