@@ -346,21 +346,19 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
     }
     
     private func addCornerPoints(_ corners: [CGPoint], distance: CGFloat) {
-        
-        for i in 0...3 {
             let layer = CAShapeLayer()
-            layer.name = "corner" + String(i)
             layer.strokeColor = UIColor(ciColor: .blue).cgColor
             layer.fillColor = UIColor(ciColor: .clear).cgColor
             let path = UIBezierPath()
             path.lineWidth = distance/2
+        for i in 0...3 {
             path.move(to: CGPoint(x: corners[i].x, y: corners[i].y+distance))
             path.addArc(withCenter: corners[i], radius: distance, startAngle: CGFloat.pi/2, endAngle: (5/2) * CGFloat.pi, clockwise: true)
             path.move(to: CGPoint(x: corners[i].x, y: corners[i].y+distance/2))
             path.addArc(withCenter: corners[i], radius: distance/2, startAngle: CGFloat.pi/2, endAngle: (5/2) * CGFloat.pi, clockwise: true)
+         }
             layer.path = path.cgPath
             currentShapeLayer.addSublayer(layer)
-         }
         if let centerX = corners.centroid()?.x, let minY = corners.map({ $0.y }).min() {
             deleteButton.frame.origin = CGPoint(x: centerX - 15, y: minY - 50)
             imageView.addSubview(deleteButton)
@@ -439,8 +437,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         cornersArray.append(firstLine)
         cornersArray.append(secondLine)
         cornersArray.append(thirdLine)
-      
-        
+       
         var ellipsePath = UIBezierPath()
         if drawingMode == .drawEllipse {
             let leftTop = cornersArray[0]
@@ -517,16 +514,17 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         case .drawRect:
             currentShapeLayer.sublayers?.forEach {$0.removeFromSuperlayer()}
             deleteButton.removeFromSuperview()
-            addCornerPoints(cornersArray, distance: 5)
             vectorType = .PATH(points: cornersArray)
             vectorData = VectorMetaData(color: colorInfo, iconUrl: "put Rect URL here", recordId: "", recordTypeId: "")
+            let corners = cornersArray.addOffset(5)  // initially we had offset when getting centers
+            addCornerPoints(corners, distance: 5)
             return thePath
         case .drawEllipse:
             currentShapeLayer.sublayers?.forEach {$0.removeFromSuperlayer()}
             deleteButton.removeFromSuperview()
-            addCornerPoints(cornersArray, distance: 5)
             vectorType = .ELLIPSE(points: cornersArray)
             vectorData = VectorMetaData(color: colorInfo, iconUrl: "put Ellipse URL here", recordId: "", recordTypeId: "")
+            addCornerPoints(cornersArray, distance: 5)
             return ellipsePath
         default:
             print("Sth is wrong!")
@@ -606,16 +604,16 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
              
             // define in which corner we are: (default is no corners)
             let positions = [cornerPoint.leftTop, cornerPoint.leftBottom, cornerPoint.rightBottom, cornerPoint.rightTop]
-            let cornersName = ["corner0", "corner1", "corner2", "corner3"]
-            imageView.layer.sublayers?.forEach { layer in
+             imageView.layer.sublayers?.forEach { layer in
                 let layer = layer as? CAShapeLayer
                  if let path = layer?.path, path.contains(panStartPoint) {
-                    print(layer!.name)
+                     
+                    
+                    
                     initialVectorType = vectorType
                     for i in 0 ... 3 {
-                        if layer?.name == cornersName[i] {
-                            corner = positions[i] // detected corner by searching sublayer
-                        }
+                             corner = positions[i] // detected corner by searching sublayer
+                         
                     }
                 }
             }

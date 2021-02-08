@@ -73,8 +73,19 @@ extension Array where Element == CGPoint {
         
     }
     
+    func addOffset(_ offset: CGFloat) -> [CGPoint] {
+        
+        let lt = CGPoint(x: self[0].x-offset, y: self[0].y-offset)
+        let lb = CGPoint(x: self[1].x-offset, y: self[1].y+offset)
+        let rb = CGPoint(x: self[2].x+offset, y: self[2].y+offset)
+        let rt = CGPoint(x: self[3].x+offset, y: self[3].y-offset)
+        let new = [lt,lb,rb,rt]
+         
+        return new
+    }
 }
 
+ 
 extension UIColor {
  
     var rgbComponents:(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) {
