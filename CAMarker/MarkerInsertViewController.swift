@@ -2,7 +2,7 @@
 
 import UIKit
 
-class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestureRecognizerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestureRecognizerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIScrollViewDelegate {
  
     var inputBundle: InputBundle?
     var vectorType: LayoutVector?
@@ -283,15 +283,12 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        ////
+
         inputBundle = InputBundle(layoutUrl: "https://www.wallpapertip.com/wmimgs/172-1729863_wallpapers-hd-4k-ultra-hd-4k-wallpaper-pc.jpg", mode: .ADD, layoutData: nil)
-        ///
-        
         // Download image from URL
         imageView.loadImageUsingCache(urlString: inputBundle?.layoutUrl ?? "", completion: {_ in })
         
-        updateMinZoomScaleForSize(view.bounds.size)
-        // disable swipe back for now to fix bug
+         // disable swipe back for now to fix bug
         navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         // color picker
         configureStackViews()
@@ -299,6 +296,9 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         saveButton.title = "save"
         saveButton.isEnabled = false
     
+        scrollView.minimumZoomScale = 0.1
+        scrollView.maximumZoomScale = 5.0
+        
         let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(scrollViewDoubleTapped))
         doubleTapRecognizer.numberOfTapsRequired = 2
         scrollView.addGestureRecognizer(doubleTapRecognizer)
@@ -650,12 +650,10 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         }
 
         if gesture.state == UIGestureRecognizer.State.ended   {
-            
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [self] in
                 scrollView.isScrollEnabled = true // enabled scroll
             }
                 resetDrag()
-               print("***** Touch Ended")
         }
     }
     
@@ -679,51 +677,57 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         return true
     }
     
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        updateMinZoomScaleForSize(view.bounds.size)
+    }
+    
     func updateMinZoomScaleForSize(_ size: CGSize) {
         let widthScale = size.width / imageView.bounds.width
         let heightScale = size.height / imageView.bounds.height
         let minScale = min(widthScale, heightScale)
-
+        
         scrollView.minimumZoomScale = minScale
         scrollView.zoomScale = minScale
     }
-
+    
+    func scrollViewDidZoom(_ scrollView: UIScrollView) {
+        updateConstraintsForSize(view.bounds.size)
+    }
+    
     func updateConstraintsForSize(_ size: CGSize) {
         let yOffset = max(0, (size.height - imageView.frame.height) / 2)
         imageViewTopConstraint.constant = yOffset
         imageViewBottomConstraint.constant = yOffset
-
+        
         let xOffset = max(0, (size.width - imageView.frame.width) / 2)
         imageViewLeadingConstraint.constant = xOffset
         imageViewTrailingConstraint.constant = xOffset
 
         view.layoutIfNeeded()
     }
-}
-
-extension MarkerInsertViewController: UIScrollViewDelegate {
+    
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return imageView
     }
+     
+      @objc func scrollViewDoubleTapped(recognizer: UITapGestureRecognizer) {
+          let pointInView = recognizer.location(in: imageView)
 
-    func scrollViewDidZoom(_ scrollView: UIScrollView) {
-        updateConstraintsForSize(view.bounds.size)
-    }
+          var newZoomScale = scrollView.zoomScale * 1.5
+          newZoomScale = min(newZoomScale, scrollView.maximumZoomScale)
 
-    @objc func scrollViewDoubleTapped(recognizer: UITapGestureRecognizer) {
-        let pointInView = recognizer.location(in: imageView)
+          let scrollViewSize = scrollView.bounds.size
+          let w = scrollViewSize.width / newZoomScale
+          let h = scrollViewSize.height / newZoomScale
+          let x = pointInView.x - (w / 2.0)
+          let y = pointInView.y - (h / 2.0)
 
-        var newZoomScale = scrollView.zoomScale * 1.5
-        newZoomScale = min(newZoomScale, scrollView.maximumZoomScale)
+          let rectToZoomTo = CGRect(x: x, y: y, width: w, height: h)
 
-        let scrollViewSize = scrollView.bounds.size
-        let w = scrollViewSize.width / newZoomScale
-        let h = scrollViewSize.height / newZoomScale
-        let x = pointInView.x - (w / 2.0)
-        let y = pointInView.y - (h / 2.0)
-
-        let rectToZoomTo = CGRect(x: x, y: y, width: w, height: h)
-
-        scrollView.zoom(to: rectToZoomTo, animated: true)
-    }
+          scrollView.zoom(to: rectToZoomTo, animated: true)
+      }
+    
 }
+
+ 
