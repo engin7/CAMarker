@@ -256,7 +256,16 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         shapeLayer.lineWidth = 2
         return shapeLayer
     }()
-
+    
+      
+    lazy var highlightLayer: CAShapeLayer = {
+       let shapeLayer = CAShapeLayer()
+       shapeLayer.strokeColor = UIColor.blue.cgColor
+       shapeLayer.fillColor = drawColor.blue.associatedColor.cgColor
+       shapeLayer.lineWidth = 2
+       return shapeLayer
+   }()
+    
     lazy var deleteButton: UIButton = {
         let button = UIButton()
         button.frame.size = CGSize(width: 40, height: 40)
@@ -303,9 +312,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
        
         saveButton.title = "save"
         saveButton.isEnabled = false
-     
-       
-
+      
         let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(scrollViewDoubleTapped))
         doubleTapRecognizer.numberOfTapsRequired = 2
         scrollView.addGestureRecognizer(doubleTapRecognizer)
@@ -505,11 +512,25 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
     @objc func singleTap(gesture: UIRotationGestureRecognizer) {
         let touchPoint = singleTapRecognizer.location(in: imageView)
          
-        if imageSafeArea.contains(touchPoint) {
-          if colorPickerHeight.constant == 288 {
-            shrinkColorPicker()
-           }
+            if imageSafeArea.contains(touchPoint) {
+              if colorPickerHeight.constant == 288 {
+                shrinkColorPicker()
+               }
  
+                if currentShapeLayer.superlayer == imageView.layer {
+                    switch vectorType {
+                    case .PIN(point: let p):
+                        let frame = CGRect(x: p.x-20, y: p.y-60, width: 40, height: 80)
+                        highlightLayer.path = UIBezierPath(roundedRect: frame, cornerRadius: 5).cgPath
+                        currentShapeLayer.addSublayer(highlightLayer)
+                        deleteButton.frame.origin = CGPoint(x: p.x-20, y: p.y - 100)
+                        imageView.addSubview(deleteButton)
+                        print("pin")
+                    default:
+                         print("single tap not detected a pin")
+                    }
+                }
+                 
                 // No shape selected or added so add new one
                 if currentShapeLayer.superlayer != imageView.layer && drawingMode != .noDrawing  {
                 // draw rectangle, ellipse etc according to selection
