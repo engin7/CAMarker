@@ -1,13 +1,22 @@
 //  MarkerInsertViewController.swift
 
 import UIKit
-
 class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestureRecognizerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     var inputBundle: InputBundle?
     var vectorType: LayoutVector?
     var vectorData: VectorMetaData? // pin/shape info
     private var toSave: ((LayoutMapData) -> Void)?
-      
+    static let markerVC = "MarkerInsertViewController"
+
+    class func initiate(layoutUrl: String, onSave: ((LayoutMapData) -> Void)?) -> MarkerInsertViewController {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let vc = storyboard.instantiateViewController(withIdentifier: MarkerInsertViewController.markerVC) as! MarkerInsertViewController
+        let input = InputBundle(layoutUrl: layoutUrl, mode: EnumLayoutMapActivity.ADD, layoutData: nil)
+        vc.inputBundle = input
+        vc.toSave = onSave
+        return vc
+    }
+    
     @IBOutlet weak var saveButton: UIBarButtonItem!
     @IBAction func saveButtonPressed(_ sender: Any) {
         if vectorType != nil, vectorData != nil {
@@ -282,8 +291,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        inputBundle = InputBundle(layoutUrl: "https://www.wallpapertip.com/wmimgs/172-1729863_wallpapers-hd-4k-ultra-hd-4k-wallpaper-pc.jpg", mode: .ADD, layoutData: nil)
+ 
         // Download image from URL
         imageView.loadImageUsingCache(urlString: inputBundle?.layoutUrl ?? "", completion: {_ in })
         

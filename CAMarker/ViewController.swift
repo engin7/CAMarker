@@ -9,18 +9,25 @@ import UIKit
 
 class ViewController: UIViewController {
 
+    var markers: [LayoutMapData] = []
+ 
     @IBOutlet weak var imageUrl: UITextField!
     @IBOutlet weak var markerInfo: UILabel!
      
     @IBAction func putMarkerPressed(_ sender: Any) {
-        
-        
-    }
+        let url = "https://www.wallpapertip.com/wmimgs/172-1729863_wallpapers-hd-4k-ultra-hd-4k-wallpaper-pc.jpg"
+        let markerVC = MarkerInsertViewController.initiate(layoutUrl: url, onSave: { [self] data in
+            // Saving Layout Marker data
+            markers.append(data)
+        })
+        self.navigationController?.pushViewController(markerVC, animated: true)
+       }
     
     
     @IBAction func openPreviewPressed(_ sender: Any) {
-        
-        
+        let layoutUrl = "https://www.wallpapertip.com/wmimgs/172-1729863_wallpapers-hd-4k-ultra-hd-4k-wallpaper-pc.jpg"
+        let vc =  MarkerPreviewViewController(markers: markers, url: layoutUrl)
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     @IBAction func searchPreviewPressed(_ sender: Any) {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="gJ3-lr-YkB">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="RhK-eq-CO3">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
@@ -18,12 +18,12 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="image url" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="0Cn-eQ-QMw">
-                                <rect key="frame" x="8" y="20" width="359" height="34"/>
+                                <rect key="frame" x="8" y="64" width="359" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HRD-fz-aEg">
-                                <rect key="frame" x="143.5" y="86" width="88" height="34"/>
+                                <rect key="frame" x="143.5" y="130" width="88" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                 <state key="normal" title="put marker"/>
                                 <connections>
@@ -31,13 +31,13 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="marker info" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YJW-t1-ner">
-                                <rect key="frame" x="8" y="128" width="359" height="21"/>
+                                <rect key="frame" x="8" y="172" width="359" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="opr-RZ-7fY">
-                                <rect key="frame" x="91.5" y="181" width="192" height="34"/>
+                                <rect key="frame" x="91.5" y="225" width="192" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                 <state key="normal" title="open Preview Controller"/>
                                 <connections>
@@ -45,7 +45,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hSL-Ug-DeH">
-                                <rect key="frame" x="86" y="247" width="203" height="34"/>
+                                <rect key="frame" x="86" y="291" width="203" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                 <state key="normal" title="search preview controller"/>
                                 <connections>
@@ -71,6 +71,7 @@
                             <constraint firstItem="0Cn-eQ-QMw" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="20" id="u51-ns-6Mo"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="eQ5-SS-9pZ"/>
                     <connections>
                         <outlet property="imageUrl" destination="0Cn-eQ-QMw" id="2XF-rF-Twq"/>
                         <outlet property="markerInfo" destination="YJW-t1-ner" id="yyV-bv-T1v"/>
@@ -78,7 +79,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3646" y="152"/>
+            <point key="canvasLocation" x="5680.8000000000002" y="151.57421289355324"/>
         </scene>
         <!--Image Map-->
         <scene sceneID="0RT-4M-E86">
@@ -319,7 +320,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="UoD-ev-pBV" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="6820" y="151.57421289355324"/>
+            <point key="canvasLocation" x="7759.1999999999998" y="151.57421289355324"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="klu-bs-Ky3">
@@ -337,7 +338,25 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="AdM-zU-R6P" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="5880.8000000000002" y="151.57421289355324"/>
+            <point key="canvasLocation" x="6820" y="151.57421289355324"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="ACF-Te-pNq">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="RhK-eq-CO3" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="Ojd-YZ-Gx3">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="0AF-9M-KqQ"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Lje-l5-x8g" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4741.6000000000004" y="151.57421289355324"/>
         </scene>
     </scenes>
     <resources>
