@@ -7,6 +7,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
     var vectorData: VectorMetaData? // pin/shape info
     private var toSave: ((LayoutMapData) -> Void)?
     static let markerVC = "MarkerInsertViewController"
+    var lastZoomScale: CGFloat = -1
 
     class func initiate(layoutUrl: String, onSave: ((LayoutMapData) -> Void)?) -> MarkerInsertViewController {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
@@ -305,7 +306,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
     
         scrollView.minimumZoomScale = 0.1
         scrollView.maximumZoomScale = 5.0
-        updateMinZoomScaleForSize(view.bounds.size)
+        updateZoom()
 
         let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(scrollViewDoubleTapped))
         doubleTapRecognizer.numberOfTapsRequired = 2
@@ -318,6 +319,12 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         dragPanRecognizer.delegate = self
         imageView.isUserInteractionEnabled = true
         imageView.addGestureRecognizer(dragPanRecognizer) // pan tutup surmek
+    }
+    
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        updateZoom()
+
     }
     
     // MARK: - Helper method for drawing Shapes
@@ -688,29 +695,53 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
    }
 extension MarkerInsertViewController: UIScrollViewDelegate {
 
-    func updateMinZoomScaleForSize(_ size: CGSize) {
-        let widthScale = size.width / imageView.bounds.width
-        let heightScale = size.height / imageView.bounds.height
-        let minScale = min(widthScale, heightScale)
-        
-        scrollView.minimumZoomScale = minScale
-        scrollView.zoomScale = minScale
-    }
     
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
-        updateConstraintsForSize(view.bounds.size)
+        updateConstraintsForSize()
     }
+   
     
-    func updateConstraintsForSize(_ size: CGSize) {
-        let yOffset = max(0, (size.height - imageView.frame.height) / 2)
-        imageViewTopConstraint.constant = yOffset
-        imageViewBottomConstraint.constant = yOffset
-        
-        let xOffset = max(0, (size.width - imageView.frame.width) / 2)
-        imageViewLeadingConstraint.constant = xOffset
-        imageViewTrailingConstraint.constant = xOffset
+    func updateConstraintsForSize() {
+      if let image = imageView.image {
+        let imageWidth = image.size.width
+        let imageHeight = image.size.height
+
+        let viewWidth = scrollView.bounds.size.width
+        let viewHeight = scrollView.bounds.size.height
+
+        // center image if it is smaller than the scroll view
+        var hPadding = (viewWidth - scrollView.zoomScale * imageWidth) / 2
+        if hPadding < 0 { hPadding = 0 }
+
+        var vPadding = (viewHeight - scrollView.zoomScale * imageHeight) / 2
+        if vPadding < 0 { vPadding = 0 }
+
+        imageViewLeadingConstraint.constant = hPadding
+        imageViewTrailingConstraint.constant = hPadding
+
+        imageViewTopConstraint.constant = vPadding
+        imageViewBottomConstraint.constant = vPadding
 
         view.layoutIfNeeded()
+      }
+    }
+    
+    // Zoom to show as much image as possible unless image is smaller than the scroll view
+    fileprivate func updateZoom() {
+      if let image = imageView.image {
+        var minZoom = min(scrollView.bounds.size.width / image.size.width,
+          scrollView.bounds.size.height / image.size.height)
+
+        if minZoom > 1 { minZoom = 1 }
+
+        scrollView.minimumZoomScale = 0.3 * minZoom
+
+        // Force scrollViewDidZoom fire if zoom did not change
+        if minZoom == lastZoomScale { minZoom += 0.000001 }
+
+        scrollView.zoomScale = minZoom
+        lastZoomScale = minZoom
+      }
     }
     
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
