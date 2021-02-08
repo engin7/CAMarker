@@ -370,8 +370,10 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
     private func modifyShape(_ corner: cornerPoint, _ withShift: (x: CGFloat, y: CGFloat)) -> UIBezierPath {
         let thePath = UIBezierPath()
         var cornersArray: [CGPoint] = [CGPoint.zero,CGPoint.zero,CGPoint.zero,CGPoint.zero]
-         
+        var point = CGPoint.zero
          switch initialVectorType  {
+         case .PIN(point: let p):
+                point = p
             case .PATH(points: let corners):
                 cornersArray = corners
             case .ELLIPSE(points: let corners):
@@ -390,7 +392,6 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         let shiftedRightBottom = CGPoint(x: rightBottom.x + withShift.x, y: rightBottom.y + withShift.y)
         let shiftedRightTop = CGPoint(x: rightTop.x + withShift.x, y: rightTop.y + withShift.y)
         
-         
         cornersArray = []
         
         var movePoint = CGPoint.zero
@@ -509,7 +510,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         switch drawingMode {
         
         case .dropPin:
-            let p = CGPoint(x: touchedPoint.x + withShift.x, y: touchedPoint.y + withShift.y)
+            let p = CGPoint(x: point.x + withShift.x, y: point.y + withShift.y)
             vectorType = .PIN(point: p)
             vectorData = VectorMetaData(color: colorInfo, iconUrl: "put pin URL here", recordId: "", recordTypeId: "")
             return drawPin(p)
@@ -649,6 +650,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
     func resetDrag() {
         corner = .noCornersSelected
         touchedPoint = CGPoint.zero
+        initialVectorType = nil
     }
  
     // MARK: - ScrollView zoom, drag etc
