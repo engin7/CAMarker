@@ -60,7 +60,6 @@ extension UIImageView {
         }
         let x =  (point.x * scale)
         let y =  (point.y * scale)
-        // here i removed (bounds.width - size.width) / 2.0 since we're operating directly on image size, we dont need origin differences.
         return CGPoint(x: x, y: y)
     }
     

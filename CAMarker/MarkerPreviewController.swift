@@ -90,7 +90,7 @@ import UIKit
                  
                  case let .PIN(pin):
                      
-                     let point = imageView.contentClippingPos(point: CGPoint(x: pin.x, y: pin.y))
+                     let point = imageView.contentClippingPos(point: pin)
                      
                      context.saveGState()
                      context.setFillColor(markerColor.cgColor)
