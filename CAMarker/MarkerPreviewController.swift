@@ -33,7 +33,6 @@ import UIKit
         configurePlot()
         imageView.loadImageUsingCache(urlString: layoutUrl ?? "", completion: { [self] (success) -> Void in
             if success {
-                layoutImage = imageView.image
                 put(markers)
             }
         })
@@ -51,8 +50,6 @@ import UIKit
          return indicator
      }()
 
-     private var layoutImage: UIImage?
-
      private var showIndicator: Bool = false {
          didSet {
              DispatchQueue.main.async { [weak self] in
@@ -69,13 +66,11 @@ import UIKit
  
      func put(_ markers: [LayoutMapData]) {
          self.markers.append(contentsOf: markers)
-         if let _ = layoutImage {
-             plotMarkers()
-         }
+           plotMarkers()
      }
   
      fileprivate func plotMarkers() {
-         if let image = layoutImage, image.size.width >= 100, image.size.height >= 100 {
+        if let image = imageView.image, image.size.width >= 100, image.size.height >= 100 {
              let clippedFrame = imageView.contentClippingRect // *This return us image's frame inside imageView
              let size = clippedFrame.size
              UIGraphicsBeginImageContext(size)

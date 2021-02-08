@@ -15,7 +15,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var markerInfo: UILabel!
      
     @IBAction func putMarkerPressed(_ sender: Any) {
-        let url = "https://www.wallpapertip.com/wmimgs/172-1729863_wallpapers-hd-4k-ultra-hd-4k-wallpaper-pc.jpg"
+        let url = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Gilbert_Stuart_Williamstown_Portrait_of_George_Washington.jpg/844px-Gilbert_Stuart_Williamstown_Portrait_of_George_Washington.jpg"
         let markerVC = MarkerInsertViewController.initiate(layoutUrl: url, onSave: { [self] data in
             // Saving Layout Marker data
             markers.append(data)
@@ -25,7 +25,7 @@ class ViewController: UIViewController {
     
     
     @IBAction func openPreviewPressed(_ sender: Any) {
-        let layoutUrl = "https://www.wallpapertip.com/wmimgs/172-1729863_wallpapers-hd-4k-ultra-hd-4k-wallpaper-pc.jpg"
+        let layoutUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Gilbert_Stuart_Williamstown_Portrait_of_George_Washington.jpg/844px-Gilbert_Stuart_Williamstown_Portrait_of_George_Washington.jpg"
         let vc =  MarkerPreviewViewController(markers: markers, url: layoutUrl)
         self.navigationController?.pushViewController(vc, animated: true)
     }
@@ -43,3 +43,4 @@ class ViewController: UIViewController {
 
 }
 
+// "https://www.wallpapertip.com/wmimgs/172-1729863_wallpapers-hd-4k-ultra-hd-4k-wallpaper-pc.jpg"
