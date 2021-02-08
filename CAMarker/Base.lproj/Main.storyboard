@@ -93,9 +93,6 @@
                                 <subviews>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="hca-YP-t1e">
                                         <rect key="frame" x="0.0" y="0.0" width="375" height="623"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="623" placeholder="YES" id="kgf-6X-qIu"/>
-                                        </constraints>
                                     </imageView>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="i3h-ew-3Ui">
                                         <rect key="frame" x="331" y="311" width="44" height="288"/>
@@ -272,13 +269,13 @@
                                 <constraints>
                                     <constraint firstItem="hca-YP-t1e" firstAttribute="leading" secondItem="AZZ-rn-riT" secondAttribute="leading" id="0Ww-d4-YZU"/>
                                     <constraint firstItem="hca-YP-t1e" firstAttribute="trailing" secondItem="AZZ-rn-riT" secondAttribute="trailing" id="2Me-Yd-aXA"/>
-                                    <constraint firstItem="hca-YP-t1e" firstAttribute="width" secondItem="FiR-I5-lfo" secondAttribute="width" id="4h5-Jg-Fuv"/>
                                     <constraint firstItem="hca-YP-t1e" firstAttribute="bottom" secondItem="AZZ-rn-riT" secondAttribute="bottom" id="8GN-ih-i6S"/>
+                                    <constraint firstItem="hca-YP-t1e" firstAttribute="height" secondItem="FiR-I5-lfo" secondAttribute="height" id="Bvv-8H-7zQ"/>
                                     <constraint firstItem="FiR-I5-lfo" firstAttribute="trailing" secondItem="ih2-Wx-0wt" secondAttribute="trailing" constant="6" id="FCX-p0-X9d"/>
                                     <constraint firstItem="FiR-I5-lfo" firstAttribute="trailing" secondItem="y6y-h2-ntD" secondAttribute="trailing" id="Gee-fc-ajk"/>
                                     <constraint firstItem="y6y-h2-ntD" firstAttribute="top" secondItem="FiR-I5-lfo" secondAttribute="top" constant="30" id="HnC-Jw-0gl"/>
-                                    <constraint firstItem="hca-YP-t1e" firstAttribute="height" secondItem="FiR-I5-lfo" secondAttribute="height" id="LfK-7m-g1z"/>
                                     <constraint firstItem="i3h-ew-3Ui" firstAttribute="trailing" secondItem="FiR-I5-lfo" secondAttribute="trailing" id="XOS-f9-ano"/>
+                                    <constraint firstItem="hca-YP-t1e" firstAttribute="width" secondItem="FiR-I5-lfo" secondAttribute="width" id="och-Ls-riN"/>
                                     <constraint firstItem="FiR-I5-lfo" firstAttribute="bottom" secondItem="i3h-ew-3Ui" secondAttribute="bottom" constant="24" id="pxX-fR-gF9"/>
                                     <constraint firstItem="hca-YP-t1e" firstAttribute="top" secondItem="AZZ-rn-riT" secondAttribute="top" id="tdT-26-Nfk"/>
                                     <constraint firstItem="FiR-I5-lfo" firstAttribute="bottom" secondItem="ih2-Wx-0wt" secondAttribute="bottom" constant="32" id="vLz-4K-nUx"/>
