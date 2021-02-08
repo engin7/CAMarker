@@ -2,8 +2,7 @@
 
 import UIKit
 
-class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestureRecognizerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIScrollViewDelegate {
- 
+class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestureRecognizerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     var inputBundle: InputBundle?
     var vectorType: LayoutVector?
     var vectorData: VectorMetaData? // pin/shape info
@@ -681,7 +680,9 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         super.viewWillLayoutSubviews()
         updateMinZoomScaleForSize(view.bounds.size)
     }
-    
+  }
+extension MarkerInsertViewController: UIScrollViewDelegate {
+
     func updateMinZoomScaleForSize(_ size: CGSize) {
         let widthScale = size.width / imageView.bounds.width
         let heightScale = size.height / imageView.bounds.height
@@ -729,5 +730,4 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
       }
     
 }
-
  
