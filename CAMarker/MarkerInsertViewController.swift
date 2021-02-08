@@ -607,14 +607,28 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
              imageView.layer.sublayers?.forEach { layer in
                 let layer = layer as? CAShapeLayer
                  if let path = layer?.path, path.contains(panStartPoint) {
-                     
-                    
-                    
                     initialVectorType = vectorType
-                    for i in 0 ... 3 {
-                             corner = positions[i] // detected corner by searching sublayer
-                         
-                    }
+                      switch initialVectorType  {
+                       case .PIN:
+                            corner = .noCornersSelected
+                       case .PATH(points: let corners):
+                        for i in 0...3 {
+                            if  corners[i].distance(to: panStartPoint) < 24 {
+                              corner = positions[i]
+                          }
+                        }
+                       case .ELLIPSE(points: let corners):
+                        for i in 0...3 {
+                          let x = corners[i].x + 5
+                          let y = corners[i].y + 5
+                          if  CGPoint(x:x, y:y).distance(to: panStartPoint) < 24 {
+                              corner = positions[i]
+                          }
+                        }
+                       default:
+                         print("")
+                   }
+                  
                 }
             }
          }
