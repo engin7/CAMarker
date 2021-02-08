@@ -509,9 +509,10 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         switch drawingMode {
         
         case .dropPin:
-            vectorType = .PIN(point: touchedPoint)
+            let p = CGPoint(x: touchedPoint.x + withShift.x, y: touchedPoint.y + withShift.y)
+            vectorType = .PIN(point: p)
             vectorData = VectorMetaData(color: colorInfo, iconUrl: "put pin URL here", recordId: "", recordTypeId: "")
-            return drawPin(touchedPoint)
+            return drawPin(p)
         case .drawRect:
             currentShapeLayer.sublayers?.forEach {$0.removeFromSuperlayer()}
             deleteButton.removeFromSuperview()
