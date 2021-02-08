@@ -7,8 +7,8 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
     var vectorData: VectorMetaData? // pin/shape info
     private var toSave: ((LayoutMapData) -> Void)?
     static let markerVC = "MarkerInsertViewController"
-    var lastZoomScale: CGFloat = -1
-
+    var flag = true
+    
     class func initiate(layoutUrl: String, onSave: ((LayoutMapData) -> Void)?) -> MarkerInsertViewController {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let vc = storyboard.instantiateViewController(withIdentifier: MarkerInsertViewController.markerVC) as! MarkerInsertViewController
@@ -303,10 +303,8 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
        
         saveButton.title = "save"
         saveButton.isEnabled = false
-    
-        scrollView.minimumZoomScale = 0.1
-        scrollView.maximumZoomScale = 5.0
-        updateZoom()
+     
+       
 
         let doubleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(scrollViewDoubleTapped))
         doubleTapRecognizer.numberOfTapsRequired = 2
@@ -319,13 +317,16 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         dragPanRecognizer.delegate = self
         imageView.isUserInteractionEnabled = true
         imageView.addGestureRecognizer(dragPanRecognizer) // pan tutup surmek
-    }
-    
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-        updateZoom()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.updateZoom()
 
+            
+        }
+        
     }
+ 
+     
     
     // MARK: - Helper method for drawing Shapes
 
@@ -735,12 +736,9 @@ extension MarkerInsertViewController: UIScrollViewDelegate {
         if minZoom > 1 { minZoom = 1 }
 
         scrollView.minimumZoomScale = 0.3 * minZoom
-
-        // Force scrollViewDidZoom fire if zoom did not change
-        if minZoom == lastZoomScale { minZoom += 0.000001 }
-
+ 
         scrollView.zoomScale = minZoom
-        lastZoomScale = minZoom
+       
       }
     }
     
