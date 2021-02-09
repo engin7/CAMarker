@@ -366,7 +366,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         }
            
         if let centerX = corners.centroid()?.x, let minY = corners.map({ $0.y }).min() {
-            deleteButton.frame.origin = CGPoint(x: centerX - 15, y: minY - 50)
+            deleteButton.frame.origin = CGPoint(x: centerX - 20, y: minY - 50)
             imageView.addSubview(deleteButton)
         }
     }
@@ -599,7 +599,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
                             corner = .noCornersSelected
                        case .PATH(points: let corners):
                         for i in 0...3 {
-                            if  corners[i].distance(to: panStartPoint) < 24 {
+                            if  corners[i].distance(to: panStartPoint) < 32 {
                               corner = positions[i]
                           }
                         }
@@ -607,7 +607,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
                         for i in 0...3 {
                           let x = corners[i].x + 5
                           let y = corners[i].y + 5
-                          if  CGPoint(x:x, y:y).distance(to: panStartPoint) < 24 {
+                          if  CGPoint(x:x, y:y).distance(to: panStartPoint) < 32 {
                               corner = positions[i]
                           }
                         }
