@@ -332,7 +332,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
     // MARK: - Helper method for drawing Shapes
 
     private func drawShape(touch: CGPoint, mode: drawMode) -> UIBezierPath {
-        let scale = CGFloat(5)
+        let scale = CGFloat(0)
         let shapeSize = min(imageView.bounds.width, imageView.bounds.height) / 10
         let size = CGSize(width: shapeSize, height: shapeSize)
         let o = CGPoint(x: touch.x-shapeSize, y: touch.y-shapeSize)
@@ -359,9 +359,9 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         
         for i in 0...3 {
             let layer = CALayer()
-            layer.contents =  #imageLiteral(resourceName: "largecircle.fill.circle").cgImage
-            let point =  imageView.layer.convert(corners[i], to: currentShapeLayer)
-            layer.frame = CGRect(origin: point, size: s)
+            layer.frame = CGRect(origin: .zero, size: s)
+            layer.position = corners[i]
+            layer.contents =  #imageLiteral(resourceName: "ellipseShapeSelected").cgImage
             currentShapeLayer.addSublayer(layer)
         }
            
@@ -476,7 +476,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
             cornersArray = [lt,lb,rb,rt]
             ellipsePath = cornersArray.drawEllipse()
         }
-        let corners = cornersArray.addOffset(5)  // initially we had offset when getting centers
+        let corners = cornersArray.addOffset(0)  // initially we had offset when getting centers
         // Save to Model. Update as dragging moved locations.
         switch drawingMode {
         case .dropPin:
