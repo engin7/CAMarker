@@ -335,37 +335,36 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         let scale = CGFloat(5)
         let shapeSize = min(imageView.bounds.width, imageView.bounds.height) / 10
         let size = CGSize(width: shapeSize, height: shapeSize)
-        let frame = CGRect(origin: touch, size: size)
+        let o = CGPoint(x: touch.x-shapeSize, y: touch.y-shapeSize)
+        let frame = CGRect(origin: o, size: size)
         let corners = frame.getCorners(offset: scale)
         
         switch mode {
             case .dropPin:
                 return touch.drawPin()
             case .drawRect:
-                addCornerPoints(corners,distance:scale)
+                addCornerPoints(corners)
                 return UIBezierPath(rect: frame)
             case .drawEllipse:
-                addCornerPoints(corners,distance:scale)
+                addCornerPoints(corners)
                 return UIBezierPath(roundedRect: frame, cornerRadius: shapeSize)
             default:
                 return UIBezierPath()
         }
     }
      
-    private func addCornerPoints(_ corners: [CGPoint], distance: CGFloat) {
-            let layer = CAShapeLayer()
-            layer.strokeColor = UIColor(ciColor: .blue).cgColor
-            layer.fillColor = UIColor(ciColor: .clear).cgColor
-            let path = UIBezierPath()
-            path.lineWidth = distance/2
+    private func addCornerPoints(_ corners: [CGPoint]) {
+        
+        let s = CGSize(width: #imageLiteral(resourceName: "largecircle.fill.circle").size.width/5, height: #imageLiteral(resourceName: "largecircle.fill.circle").size.width/5) // change it for scale
+        
         for i in 0...3 {
-            path.move(to: CGPoint(x: corners[i].x, y: corners[i].y+distance))
-            path.addArc(withCenter: corners[i], radius: distance, startAngle: CGFloat.pi/2, endAngle: (5/2) * CGFloat.pi, clockwise: true)
-            path.move(to: CGPoint(x: corners[i].x, y: corners[i].y+distance/2))
-            path.addArc(withCenter: corners[i], radius: distance/2, startAngle: CGFloat.pi/2, endAngle: (5/2) * CGFloat.pi, clockwise: true)
-         }
-            layer.path = path.cgPath
+            let layer = CALayer()
+            layer.contents =  #imageLiteral(resourceName: "largecircle.fill.circle").cgImage
+            let point =  imageView.layer.convert(corners[i], to: currentShapeLayer)
+            layer.frame = CGRect(origin: point, size: s)
             currentShapeLayer.addSublayer(layer)
+        }
+           
         if let centerX = corners.centroid()?.x, let minY = corners.map({ $0.y }).min() {
             deleteButton.frame.origin = CGPoint(x: centerX - 15, y: minY - 50)
             imageView.addSubview(deleteButton)
@@ -477,10 +476,9 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
             cornersArray = [lt,lb,rb,rt]
             ellipsePath = cornersArray.drawEllipse()
         }
- 
+        let corners = cornersArray.addOffset(5)  // initially we had offset when getting centers
         // Save to Model. Update as dragging moved locations.
         switch drawingMode {
-        
         case .dropPin:
             let p = CGPoint(x: point.x + withShift.x, y: point.y + withShift.y)
             vectorType = .PIN(point: p)
@@ -491,15 +489,14 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
             deleteButton.removeFromSuperview()
             vectorType = .PATH(points: cornersArray)
             vectorData = VectorMetaData(color: colorInfo, iconUrl: "put Rect URL here", recordId: "", recordTypeId: "")
-            let corners = cornersArray.addOffset(5)  // initially we had offset when getting centers
-            addCornerPoints(corners, distance: 5)
+            addCornerPoints(corners)
             return thePath
         case .drawEllipse:
             currentShapeLayer.sublayers?.forEach {$0.removeFromSuperlayer()}
             deleteButton.removeFromSuperview()
             vectorType = .ELLIPSE(points: cornersArray)
             vectorData = VectorMetaData(color: colorInfo, iconUrl: "put Ellipse URL here", recordId: "", recordTypeId: "")
-            addCornerPoints(cornersArray, distance: 5)
+            addCornerPoints(corners)
             return ellipsePath
         default:
             print("Sth is wrong!")
