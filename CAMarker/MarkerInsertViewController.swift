@@ -280,6 +280,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
     func resetUI() {
         saveButton.isEnabled = false
         currentShapeLayer.path = nil
+        currentShapeLayer.lineDashPattern = nil
         currentShapeLayer.removeFromSuperlayer()
         currentShapeLayer.sublayers?.forEach { $0.removeFromSuperlayer()}
         deleteButton.removeFromSuperview()
@@ -355,13 +356,13 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
     private func addCornerPoints(_ corners: [CGPoint]) {
         
         let s = CGSize(width: #imageLiteral(resourceName: "largecircle.fill.circle").size.width/5, height: #imageLiteral(resourceName: "largecircle.fill.circle").size.width/5) // change it for scale
-        
+      
         for i in 0...3 {
-            let layer = CALayer()
+            let layer = CAShapeLayer()
             layer.frame = CGRect(origin: .zero, size: s)
             layer.position = corners[i]
             layer.contents =  #imageLiteral(resourceName: "ellipseShapeSelected").cgImage
-            currentShapeLayer.addSublayer(layer)
+            self.currentShapeLayer.addSublayer(layer)
         }
             
     }
@@ -473,6 +474,9 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         }
         let corners = cornersArray.addOffset(0)  // initially we had offset when getting centers
         // Save to Model. Update as dragging moved locations.
+            currentShapeLayer.lineDashPattern = nil
+            deleteButton.removeFromSuperview()
+            currentShapeLayer.sublayers?.forEach {$0.removeFromSuperlayer()}
         switch drawingMode {
         case .dropPin:
             let p = CGPoint(x: point.x + withShift.x, y: point.y + withShift.y)
@@ -480,15 +484,11 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
             vectorData = VectorMetaData(color: colorInfo, iconUrl: "put pin URL here", recordId: "", recordTypeId: "")
             return p.drawPin()
         case .drawRect:
-            currentShapeLayer.sublayers?.forEach {$0.removeFromSuperlayer()}
-            deleteButton.removeFromSuperview()
             vectorType = .PATH(points: cornersArray)
             vectorData = VectorMetaData(color: colorInfo, iconUrl: "put Rect URL here", recordId: "", recordTypeId: "")
             addCornerPoints(corners)
             return thePath
         case .drawEllipse:
-            currentShapeLayer.sublayers?.forEach {$0.removeFromSuperlayer()}
-            deleteButton.removeFromSuperview()
             vectorType = .ELLIPSE(points: cornersArray)
             vectorData = VectorMetaData(color: colorInfo, iconUrl: "put Ellipse URL here", recordId: "", recordTypeId: "")
             addCornerPoints(corners)
@@ -516,7 +516,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
                         highlightLayer.path = UIBezierPath(roundedRect: frame, cornerRadius: 5).cgPath
                         if highlightLayer.superlayer != currentShapeLayer {
                             currentShapeLayer.addSublayer(highlightLayer)
-                            deleteButton.frame.origin = CGPoint(x: p.x-20, y: p.y - 100)
+                            deleteButton.frame.origin = CGPoint(x: p.x-17, y: p.y - 100)
                             imageView.addSubview(deleteButton)
                         } else {
                             deleteButton.removeFromSuperview()
@@ -527,15 +527,19 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
                         if deleteButton.superview != imageView, let centerX = corners.centroid()?.x, let minY = corners.map({ $0.y }).min() {
                             deleteButton.frame.origin = CGPoint(x: centerX - 20, y: minY - 50)
                             imageView.addSubview(deleteButton)
+                            currentShapeLayer.lineDashPattern = [10, 5, 5, 5]
                         } else {
                             deleteButton.removeFromSuperview()
+                            currentShapeLayer.lineDashPattern = nil
                         }
                     case .ELLIPSE(points: let corners):
                         if deleteButton.superview != imageView, let centerX = corners.centroid()?.x, let minY = corners.map({ $0.y }).min() {
                             deleteButton.frame.origin = CGPoint(x: centerX - 20, y: minY - 50)
                             imageView.addSubview(deleteButton)
+                            currentShapeLayer.lineDashPattern = [10, 5, 5, 5]
                         }  else {
                             deleteButton.removeFromSuperview()
+                            currentShapeLayer.lineDashPattern = nil
                         }
                     default:
                          print("single tap not detected a pin")
@@ -606,12 +610,10 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
             let positions = [cornerPoint.leftTop, cornerPoint.leftBottom, cornerPoint.rightBottom, cornerPoint.rightTop]
              imageView.layer.sublayers?.forEach { layer in
                 let layer = layer as? CAShapeLayer
-                 if let path = layer?.path, path.contains(panStartPoint) {
+                    if let path = layer?.path, path.contains(panStartPoint)   {
                     initialVectorType = vectorType
                       switch initialVectorType  {
                        case .PIN:
-                            currentShapeLayer.sublayers?.forEach { $0.removeFromSuperlayer()}
-                            deleteButton.removeFromSuperview()
                             corner = .noCornersSelected
                        case .PATH(points: let corners):
                         for i in 0...3 {
@@ -621,9 +623,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
                         }
                        case .ELLIPSE(points: let corners):
                         for i in 0...3 {
-                          let x = corners[i].x + 5
-                          let y = corners[i].y + 5
-                          if  CGPoint(x:x, y:y).distance(to: panStartPoint) < 32 {
+                            if  corners[i].distance(to: panStartPoint) < 32 {
                               corner = positions[i]
                           }
                         }
@@ -631,7 +631,15 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
                          print("")
                    }
                   
-                }
+                   }  else  {
+                        layer?.sublayers?.forEach { sublayer in
+                            let frame = self.imageView.layer.convert(sublayer.frame, from: currentShapeLayer)
+                            if frame.contains(panStartPoint)   {
+                                print("corner det")
+                            }
+                        }
+                    print("NOT IN CurrentLAYER PATH***")
+                 }
             }
          }	
             touchedPoint = panStartPoint // to offset reference
