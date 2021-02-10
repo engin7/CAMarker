@@ -579,6 +579,29 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         }
        
   }
+    // refactor this with editing enum
+    func cornerDetection(_ positions: [MarkerInsertViewController.cornerPoint]) {
+        initialVectorType = vectorType
+          switch initialVectorType  {
+           case .PIN:
+                corner = .noCornersSelected
+           case .PATH(points: let corners):
+            for i in 0...3 {
+                if  corners[i].distance(to: panStartPoint) < 32 {
+                  corner = positions[i]
+              }
+            }
+           case .ELLIPSE(points: let corners):
+            for i in 0...3 {
+                if  corners[i].distance(to: panStartPoint) < 32 {
+                  corner = positions[i]
+              }
+            }
+           default:
+             print("")
+       }
+       }
+    
     
     // MARK: - Drag logic
 
@@ -611,34 +634,14 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
              imageView.layer.sublayers?.forEach { layer in
                 let layer = layer as? CAShapeLayer
                     if let path = layer?.path, path.contains(panStartPoint)   {
-                    initialVectorType = vectorType
-                      switch initialVectorType  {
-                       case .PIN:
-                            corner = .noCornersSelected
-                       case .PATH(points: let corners):
-                        for i in 0...3 {
-                            if  corners[i].distance(to: panStartPoint) < 32 {
-                              corner = positions[i]
-                          }
-                        }
-                       case .ELLIPSE(points: let corners):
-                        for i in 0...3 {
-                            if  corners[i].distance(to: panStartPoint) < 32 {
-                              corner = positions[i]
-                          }
-                        }
-                       default:
-                         print("")
-                   }
-                  
-                   }  else  {
+                        cornerDetection(positions)
+                     }  else  {
                         layer?.sublayers?.forEach { sublayer in
                             let frame = self.imageView.layer.convert(sublayer.frame, from: currentShapeLayer)
                             if frame.contains(panStartPoint)   {
-                                print("corner det")
+                                cornerDetection(positions)
                             }
                         }
-                    print("NOT IN CurrentLAYER PATH***")
                  }
             }
          }	
