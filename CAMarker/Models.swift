@@ -6,6 +6,11 @@
 //
 
 import UIKit
+ 
+class DataBase {
+    static let shared = DataBase()
+    var markers: [LayoutMapData] = []
+}
 
 enum cornerPoint {
     // corners selected
@@ -48,3 +53,4 @@ enum EnumLayoutMapActivity: Int {
     case ADD = 1
     case EDIT = 2
 }
+

@@ -89,7 +89,7 @@ import UIKit
         if let image = imageView.image, image.size.width >= 100, image.size.height >= 100  {
                 
             for marker in markers {
-                let shapeLayer = currentShapeLayer
+                let shapeLayer = CAShapeLayer()
                 var path = UIBezierPath()
                 switch marker.vector {
                     case .PIN(point: let p):

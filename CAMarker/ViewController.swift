@@ -6,9 +6,7 @@
 //
 
 import UIKit
-
-    var markers: [LayoutMapData] = []
-
+ 
 class ViewController: UIViewController {
  
     @IBOutlet weak var imageUrl: UITextField!
@@ -18,7 +16,7 @@ class ViewController: UIViewController {
         let url = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Gilbert_Stuart_Williamstown_Portrait_of_George_Washington.jpg/844px-Gilbert_Stuart_Williamstown_Portrait_of_George_Washington.jpg"
         let markerVC = MarkerInsertViewController.initiate(layoutUrl: url, onSave: { [self] data in
             // Saving Layout Marker data
-            markers.append(data)
+            dataBase.markers.append(data)
             switch data.vector {
                 case .PIN(point: let p):
                     markerInfo.text  = "type: PIN" + ", points :" + p.debugDescription
@@ -34,7 +32,7 @@ class ViewController: UIViewController {
     
     @IBAction func openPreviewPressed(_ sender: Any) {
         let layoutUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Gilbert_Stuart_Williamstown_Portrait_of_George_Washington.jpg/844px-Gilbert_Stuart_Williamstown_Portrait_of_George_Washington.jpg"
-        let vc =  MarkerPreviewViewController.initiate(layoutUrl: layoutUrl, markers: markers)
+        let vc =  MarkerPreviewViewController.initiate(layoutUrl: layoutUrl, markers: dataBase.markers)
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
