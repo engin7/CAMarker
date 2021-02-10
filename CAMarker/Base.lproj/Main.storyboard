@@ -268,6 +268,17 @@
                                             <constraint firstItem="7x9-pb-2Pf" firstAttribute="top" secondItem="R5I-I5-GLe" secondAttribute="bottom" constant="8" symbolic="YES" id="viE-Bp-uH4"/>
                                             <constraint firstAttribute="trailing" secondItem="M0W-Ae-ZAw" secondAttribute="trailing" constant="6" id="xsN-ib-eWX"/>
                                         </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                <integer key="value" value="22"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="layer.borderColor">
+                                                <color key="value" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="layer.borderWidth">
+                                                <integer key="value" value="1"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
                                     </view>
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemGray2Color"/>

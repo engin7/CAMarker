@@ -7,7 +7,6 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
     var vectorData: VectorMetaData? // pin/shape info
     private var toSave: ((LayoutMapData) -> Void)?
     static let markerVC = "MarkerInsertViewController"
-    var flag = true
     
     class func initiate(layoutUrl: String, onSave: ((LayoutMapData) -> Void)?) -> MarkerInsertViewController {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
@@ -519,10 +518,14 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
                     case .PIN(point: let p):
                         let frame = CGRect(x: p.x-20, y: p.y-60, width: 40, height: 80)
                         highlightLayer.path = UIBezierPath(roundedRect: frame, cornerRadius: 5).cgPath
-                        currentShapeLayer.addSublayer(highlightLayer)
-                        deleteButton.frame.origin = CGPoint(x: p.x-20, y: p.y - 100)
-                        imageView.addSubview(deleteButton)
-                        print("pin")
+                        if highlightLayer.superlayer != currentShapeLayer {
+                            currentShapeLayer.addSublayer(highlightLayer)
+                            deleteButton.frame.origin = CGPoint(x: p.x-20, y: p.y - 100)
+                            imageView.addSubview(deleteButton)
+                        } else {
+                            deleteButton.removeFromSuperview()
+                            highlightLayer.removeFromSuperlayer()
+                        }
                     default:
                          print("single tap not detected a pin")
                     }
@@ -596,6 +599,8 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
                     initialVectorType = vectorType
                       switch initialVectorType  {
                        case .PIN:
+                            currentShapeLayer.sublayers?.forEach { $0.removeFromSuperlayer()}
+                            deleteButton.removeFromSuperview()
                             corner = .noCornersSelected
                        case .PATH(points: let corners):
                         for i in 0...3 {
@@ -729,3 +734,4 @@ extension MarkerInsertViewController: UIScrollViewDelegate {
       }
 }
  
+
