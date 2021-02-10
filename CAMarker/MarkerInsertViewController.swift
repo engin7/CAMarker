@@ -88,6 +88,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
             return
         }
         animateColorPicker()
+        changeFillColor()
     }
     
     @IBOutlet var bottomColorButton: UIButton!
@@ -549,7 +550,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
                 // No shape selected or added so add new one
                 if currentShapeLayer.superlayer != imageView.layer && drawingMode != .noDrawing  {
                 // draw rectangle, ellipse etc according to selection
-                currentShapeLayer.fillColor? = drawingColor.associatedColor.cgColor
+                changeFillColor()
                 let path = drawShape(touch: touchPoint, mode: drawingMode)
                 currentShapeLayer.path = path.cgPath
                 let cornerPoints = currentShapeLayer.path!.boundingBox.getCorners(offset: 0)
@@ -579,6 +580,18 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         }
        
   }
+    
+    private func changeFillColor() {
+        currentShapeLayer.fillColor? = drawingColor.associatedColor.cgColor
+        switch drawingMode {
+           case .dropPin:
+            currentShapeLayer.fillColor? = drawingColor.associatedColor.withAlphaComponent(1).cgColor
+         default:
+            print("")
+        }
+    }
+    
+    
     // refactor this with editing enum
     func cornerDetection(_ positions: [MarkerInsertViewController.cornerPoint]) {
         initialVectorType = vectorType

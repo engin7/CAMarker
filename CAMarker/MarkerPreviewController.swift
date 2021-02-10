@@ -27,7 +27,7 @@ import UIKit
         let shapeLayer = CAShapeLayer()
         shapeLayer.strokeColor = UIColor.black.cgColor
         shapeLayer.fillColor = UIColor.clear.cgColor
-         shapeLayer.lineWidth = 2
+        shapeLayer.lineWidth = 2
         return shapeLayer
      }()
   
@@ -80,24 +80,27 @@ import UIKit
 
     @objc func singleTap(gesture: UIRotationGestureRecognizer) {
         let touchPoint = singleTapRecognizer.location(in: imageView)
-      
+        
   }
     
     // MARK: - Draw items
     
      fileprivate func plot() {
         if let image = imageView.image, image.size.width >= 100, image.size.height >= 100  {
-                
             for marker in markers {
                 let shapeLayer = CAShapeLayer()
+                shapeLayer.strokeColor = UIColor.black.cgColor
+                shapeLayer.lineWidth = 4
+                shapeLayer.fillColor = UIColor(hex: marker.metaData.color)!.withAlphaComponent(0.25).cgColor
                 var path = UIBezierPath()
                 switch marker.vector {
                     case .PIN(point: let p):
+                        shapeLayer.fillColor = UIColor(hex: marker.metaData.color)!.cgColor
                         path = p.drawPin()
                    case .PATH(points: let corners):
                         path = corners.drawRect()
                    case .ELLIPSE(points: let corners):
-                        path = corners.drawRect()
+                        path = corners.drawEllipse()
                 }
                 shapeLayer.path = path.cgPath
                 imageView.layer.addSublayer(shapeLayer)
@@ -159,9 +162,7 @@ import UIKit
               scrollView.bounds.size.height / image.size.height)
 
             if minZoom > 1 { minZoom = 1 }
-
             scrollView.minimumZoomScale = 0.3 * minZoom
-     
             scrollView.zoomScale = minZoom
           }
         }
