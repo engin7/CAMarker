@@ -81,8 +81,13 @@ import UIKit
     @objc func singleTap(gesture: UIRotationGestureRecognizer) {
         let touchPoint = singleTapRecognizer.location(in: imageView)
         
-  }
-    
+        imageView.layer.sublayers?.forEach { layer in
+           let layer = layer as? CAShapeLayer
+               if let path = layer?.path, path.contains(touchPoint)   {
+                  print("touched shape")
+               }
+        }
+    }
     // MARK: - Draw items
     
      fileprivate func plot() {

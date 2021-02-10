@@ -509,8 +509,9 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
               if colorPickerHeight.constant == 288 {
                 shrinkColorPicker()
                }
- 
-                if currentShapeLayer.superlayer == imageView.layer {
+                imageView.layer.sublayers?.forEach { layer in
+                   let layer = layer as? CAShapeLayer
+                       if let path = layer?.path, path.contains(touchPoint)   {
                     switch vectorType {
                     case .PIN(point: let p):
                         let frame = CGRect(x: p.x-20, y: p.y-60, width: 40, height: 80)
@@ -546,7 +547,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
                          print("single tap not detected a pin")
                     }
                 }
-                 
+                }
                 // No shape selected or added so add new one
                 if currentShapeLayer.superlayer != imageView.layer && drawingMode != .noDrawing  {
                 // draw rectangle, ellipse etc according to selection
