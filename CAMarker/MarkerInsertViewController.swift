@@ -363,11 +363,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
             layer.contents =  #imageLiteral(resourceName: "ellipseShapeSelected").cgImage
             currentShapeLayer.addSublayer(layer)
         }
-           
-        if let centerX = corners.centroid()?.x, let minY = corners.map({ $0.y }).min() {
-            deleteButton.frame.origin = CGPoint(x: centerX - 20, y: minY - 50)
-            imageView.addSubview(deleteButton)
-        }
+            
     }
   
     private func modifyShape(_ corner: cornerPoint, _ withShift: (x: CGFloat, y: CGFloat)) -> UIBezierPath {
@@ -525,6 +521,21 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
                         } else {
                             deleteButton.removeFromSuperview()
                             highlightLayer.removeFromSuperlayer()
+                        }
+                    case .PATH(points: let corners):
+                        
+                        if deleteButton.superview != imageView, let centerX = corners.centroid()?.x, let minY = corners.map({ $0.y }).min() {
+                            deleteButton.frame.origin = CGPoint(x: centerX - 20, y: minY - 50)
+                            imageView.addSubview(deleteButton)
+                        } else {
+                            deleteButton.removeFromSuperview()
+                        }
+                    case .ELLIPSE(points: let corners):
+                        if deleteButton.superview != imageView, let centerX = corners.centroid()?.x, let minY = corners.map({ $0.y }).min() {
+                            deleteButton.frame.origin = CGPoint(x: centerX - 20, y: minY - 50)
+                            imageView.addSubview(deleteButton)
+                        }  else {
+                            deleteButton.removeFromSuperview()
                         }
                     default:
                          print("single tap not detected a pin")
