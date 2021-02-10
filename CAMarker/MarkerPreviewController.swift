@@ -6,56 +6,54 @@
 //
  
 import UIKit
-
+ 
  class MarkerPreviewViewController: UIViewController {
   
-     var layoutUrl: String?
+     static let previewVC = "MarkerPreviewViewController"
+     var inputBundle: InputBundle?
+     typealias markersDict = [(LayoutMapData,CAShapeLayer)]
      var markers: [LayoutMapData] = []
-     var markerDict: [(LayoutMapData,CAShapeLayer)] = []
-     private var plotView: UIImageView?
      var singleTapRecognizer: UITapGestureRecognizer!
     
-     var currentShapeLayer: CAShapeLayer = {
+    @IBOutlet weak var imageView: UIImageView!
+    @IBOutlet weak var scrollView: UIScrollView!
+    
+    @IBOutlet var imageViewBottomConstraint: NSLayoutConstraint!
+    @IBOutlet var imageViewLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet var imageViewTopConstraint: NSLayoutConstraint!
+    @IBOutlet var imageViewTrailingConstraint: NSLayoutConstraint!
+    
+    private lazy var currentShapeLayer: CAShapeLayer = {
         let shapeLayer = CAShapeLayer()
         shapeLayer.strokeColor = UIColor.black.cgColor
         shapeLayer.fillColor = UIColor.clear.cgColor
          shapeLayer.lineWidth = 2
         return shapeLayer
      }()
-    
-     private let imageView: UIImageView = {
-         let iv = UIImageView(frame: .zero)
-         iv.translatesAutoresizingMaskIntoConstraints = false
-         iv.contentMode = .scaleAspectFit
-         iv.backgroundColor = .clear
-         return iv
-     }()
-     
-    init(markers: [LayoutMapData], url: String) {
-            self.markers = markers
-            self.layoutUrl = url
-            super.init(nibName: nil, bundle: nil)
-        }
+  
+    class func initiate(layoutUrl: String, markers: [LayoutMapData] )-> MarkerPreviewViewController {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let vc = storyboard.instantiateViewController(withIdentifier: MarkerPreviewViewController.previewVC) as! MarkerPreviewViewController
+        let input = InputBundle(layoutUrl: layoutUrl, mode: EnumLayoutMapActivity.VIEW, layoutData: nil)
+        vc.inputBundle = input
+        vc.markers = markers
+        return vc
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
-        configurePlot()
-        imageView.loadImageUsingCache(urlString: layoutUrl ?? "", completion: { [self] (success) -> Void in
+        imageView.loadImageUsingCache(urlString: inputBundle?.layoutUrl ?? "", completion: { [self] (success) -> Void in
             if success {
-                put(markers)
+                updateZoom()
+                plot()
+                showIndicator = false
             }
         })
         singleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(singleTap))
         imageView.addGestureRecognizer(singleTapRecognizer)
-        
     }
-     
-     required init?(coder: NSCoder) {
-         fatalError("init(coder:) has not been implemented")
-     }
       
-    
      private let loaderView: UIActivityIndicatorView = {
          let indicator = UIActivityIndicatorView(style: .gray)
          indicator.translatesAutoresizingMaskIntoConstraints = false
@@ -77,137 +75,121 @@ import UIKit
          }
      }
  
-     func put(_ markers: [LayoutMapData]) {
-         self.markers.append(contentsOf: markers)
-           plotMarkers()
-     }
-  
+    
     // MARK: - Single Tap Logic
 
     @objc func singleTap(gesture: UIRotationGestureRecognizer) {
         let touchPoint = singleTapRecognizer.location(in: imageView)
-        
-       
+      
   }
     
     // MARK: - Draw items
     
-     fileprivate func plotMarkers() {
-        if let image = imageView.image, image.size.width >= 100, image.size.height >= 100 {
-             let clippedFrame = imageView.contentClippingRect // *This return us image's frame inside imageView
-             let size = clippedFrame.size
-             UIGraphicsBeginImageContext(size)
-             
-             guard let context = UIGraphicsGetCurrentContext() else {
-                 return
-             }
-             // TODO: - change this to UIBezierPath
-             for marker in markers {
-                 let markerColor = UIColor(ciColor: .red)
-                 switch marker.vector {
-                 
-                 case let .PIN(pin):
-                     
-                     let point = imageView.contentClippingPos(point: pin)
-                     
-                     context.saveGState()
-                     context.setFillColor(markerColor.cgColor)
-                     context.setStrokeColor(markerColor.cgColor)
-                     context.setLineWidth(2)
-                     
-                     context.move(to: point)
-                     let lineEnd: CGPoint = .init(x: point.x, y: point.y - 25.0)
-                     context.addLine(to: lineEnd)
-
-                     context.addEllipse(in: .init(x: lineEnd.x - 5.0, y: lineEnd.y - 5.0, width: 10.0, height: 10.0))
-                     
-                     context.drawPath(using: .fillStroke)
-                     context.restoreGState()
-                     break
-                 case let .PATH(points):
-                     context.saveGState()
-
-                     context.setFillColor(markerColor.cgColor)
-                     context.setAlpha(0.5)
-
-                     for index in 0 ..< points.count {
-                         let pin = points[index]
-                         let point = pin
-                         if index == 0 {
-                             context.move(to: point)
-                         } else {
-                             context.addLine(to: point)
-                         }
-                     }
-                     context.closePath()
-                     context.drawPath(using: .fillStroke)
-                     context.restoreGState()
-                        
-                     context.saveGState()
-                     context.setFillColor(markerColor.cgColor)
-                     for pin in points {
-                         let point = pin.addOffset(96, 96)
-                         context.addEllipse(in: .init(x: point.x - 9.0, y: point.y - 9.0, width: 18.0, height: 18.0))
-                     }
-                     context.drawPath(using: .fillStroke)
-                     context.restoreGState()
-
-                     break
-                 case .ELLIPSE:
-                      
-                     break
-                  }
-             }
-             if let image = UIGraphicsGetImageFromCurrentImageContext() {
-                 DispatchQueue.main.async {
-                     self.plotView?.image = image.imageWithBorder(width: 2, color: UIColor.yellow)
-                     self.plotView?.setNeedsDisplay()
-                     
-                 }
-             }
-                 UIGraphicsEndImageContext()
-         }
+     fileprivate func plot() {
+        if let image = imageView.image, image.size.width >= 100, image.size.height >= 100  {
+                
+            for marker in markers {
+                let shapeLayer = currentShapeLayer
+                var path = UIBezierPath()
+                switch marker.vector {
+                    case .PIN(point: let p):
+                        path = p.drawPin()
+                   case .PATH(points: let corners):
+                        path = corners.drawRect()
+                   case .ELLIPSE(points: let corners):
+                        path = corners.drawRect()
+                }
+                shapeLayer.path = path.cgPath
+                imageView.layer.addSublayer(shapeLayer)
+            }
+        }
      }
 
      fileprivate func configure() {
-          
+         showIndicator = true
          self.view.backgroundColor = .gray
-         self.view.addSubview(imageView)
          self.view.addSubview(loaderView)
-
          NSLayoutConstraint.activate([
-            imageView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
-            imageView.rightAnchor.constraint(equalTo: self.view.rightAnchor),
-            imageView.topAnchor.constraint(equalTo: self.view.topAnchor),
-            imageView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
             loaderView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
             loaderView.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
              loaderView.widthAnchor.constraint(equalToConstant: 48),
              loaderView.heightAnchor.constraint(equalToConstant: 48),
          ])
      }
-     
-     fileprivate func configurePlot() {
-        
-         self.plotView = UIImageView()
-          if let pv = self.plotView {
-            self.view.addSubview(pv)
-             pv.backgroundColor = .clear
-             pv.contentMode = .scaleAspectFit
-             pv.translatesAutoresizingMaskIntoConstraints = false
-             NSLayoutConstraint.activate([
-                 pv.leftAnchor.constraint(equalTo: imageView.leftAnchor),
-                 pv.rightAnchor.constraint(equalTo: imageView.rightAnchor),
-                 pv.topAnchor.constraint(equalTo: imageView.topAnchor),
-                 pv.bottomAnchor.constraint(equalTo: imageView.bottomAnchor),
-             ])
-          }
-       }
+ 
  }
+ 
+    //MARK: - ScrollView Delegate
 
- extension CGPoint {
-     func addOffset(_ x: CGFloat, _ y: CGFloat) -> CGPoint {
-         return .init(x: self.x + x, y: self.y + y)
+    extension MarkerPreviewViewController: UIScrollViewDelegate {
+
+        func scrollViewDidZoom(_ scrollView: UIScrollView) {
+            updateConstraintsForSize()
+        }
+
+        func updateConstraintsForSize() {
+          if let image = imageView.image {
+            let imageWidth = image.size.width
+            let imageHeight = image.size.height
+
+            let viewWidth = scrollView.bounds.size.width
+            let viewHeight = scrollView.bounds.size.height
+
+            // center image if it is smaller than the scroll view
+            var hPadding = (viewWidth - scrollView.zoomScale * imageWidth) / 2
+            if hPadding < 0 { hPadding = 0 }
+
+            var vPadding = (viewHeight - scrollView.zoomScale * imageHeight) / 2
+            if vPadding < 0 { vPadding = 0 }
+
+            imageViewLeadingConstraint.constant = hPadding
+            imageViewTrailingConstraint.constant = hPadding
+
+            imageViewTopConstraint.constant = vPadding
+            imageViewBottomConstraint.constant = vPadding
+
+            view.layoutIfNeeded()
+          }
+        }
+        
+        // Zoom to show as much image as possible unless image is smaller than the scroll view
+        fileprivate func updateZoom() {
+          if let image = imageView.image {
+            var minZoom = min(scrollView.bounds.size.width / image.size.width,
+              scrollView.bounds.size.height / image.size.height)
+
+            if minZoom > 1 { minZoom = 1 }
+
+            scrollView.minimumZoomScale = 0.3 * minZoom
+     
+            scrollView.zoomScale = minZoom
+          }
+        }
+        
+        func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+            return imageView
+        }
+         
+          @objc func scrollViewDoubleTapped(recognizer: UITapGestureRecognizer) {
+              let pointInView = recognizer.location(in: imageView)
+
+              var newZoomScale = scrollView.zoomScale * 1.5
+              newZoomScale = min(newZoomScale, scrollView.maximumZoomScale)
+
+              let scrollViewSize = scrollView.bounds.size
+              let w = scrollViewSize.width / newZoomScale
+              let h = scrollViewSize.height / newZoomScale
+              let x = pointInView.x - (w / 2.0)
+              let y = pointInView.y - (h / 2.0)
+              let rectToZoomTo = CGRect(x: x, y: y, width: w, height: h)
+              scrollView.zoom(to: rectToZoomTo, animated: true)
+          }
+    }
+ 
+ 
+     extension CGPoint {
+         func addOffset(_ x: CGFloat, _ y: CGFloat) -> CGPoint {
+             return .init(x: self.x + x, y: self.y + y)
+         }
      }
- }
 

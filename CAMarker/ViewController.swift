@@ -7,9 +7,9 @@
 
 import UIKit
 
-class ViewController: UIViewController {
-
     var markers: [LayoutMapData] = []
+
+class ViewController: UIViewController {
  
     @IBOutlet weak var imageUrl: UITextField!
     @IBOutlet weak var markerInfo: UILabel!
@@ -19,6 +19,14 @@ class ViewController: UIViewController {
         let markerVC = MarkerInsertViewController.initiate(layoutUrl: url, onSave: { [self] data in
             // Saving Layout Marker data
             markers.append(data)
+            switch data.vector {
+                case .PIN(point: let p):
+                    markerInfo.text  = "type: PIN" + ", points :" + p.debugDescription
+               case .PATH(points: let corners):
+                    markerInfo.text  = "type: PATH" + ", points :" + corners.debugDescription
+               case .ELLIPSE(points: let corners):
+                    markerInfo.text  = "type: ELLIPSE" + ", points :" + corners.debugDescription
+            }      
         })
         self.navigationController?.pushViewController(markerVC, animated: true)
        }
@@ -26,7 +34,7 @@ class ViewController: UIViewController {
     
     @IBAction func openPreviewPressed(_ sender: Any) {
         let layoutUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Gilbert_Stuart_Williamstown_Portrait_of_George_Washington.jpg/844px-Gilbert_Stuart_Williamstown_Portrait_of_George_Washington.jpg"
-        let vc =  MarkerPreviewViewController(markers: markers, url: layoutUrl)
+        let vc =  MarkerPreviewViewController.initiate(layoutUrl: layoutUrl, markers: markers)
         self.navigationController?.pushViewController(vc, animated: true)
     }
     

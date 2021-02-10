@@ -7,6 +7,17 @@
 
 import UIKit
 
+enum cornerPoint {
+    // corners selected
+    case leftTop
+    case leftBottom
+    case rightBottom
+    case rightTop
+    case noCornersSelected
+    init() {
+        self = .noCornersSelected
+    }
+}
 
 struct LayoutMapData {
     let vector: LayoutVector
