@@ -23,7 +23,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
             let data = LayoutMapData(vector: vectorType!, metaData: vectorData!)
             if let save = toSave {
                 (save)(data)
-                self.navigationController?.popViewController(animated: false)
+                self.navigationController?.popViewController(animated: true)
             } else {
                 print("Not initialized correctly")
             }
@@ -41,21 +41,43 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
             drawingMode = drawMode.drawRect
         case 2:
             drawingMode = drawMode.drawEllipse
+        case 3:
+            drawingMode = drawMode.drawPoly
+        case 4:
+            drawingMode = drawMode.dropImage
+            openPicker()
+            // change icon with closure here
+//            button.image(for: <#T##UIControl.State#>)
         default:
             print("Unknown shape")
             return
         }
     }
     
-    var drawingMode = drawMode.dropPin
+    var drawingMode = drawMode.dropPin //default
     enum drawMode {
         case dropPin
         case drawRect
         case drawEllipse
-        case dropPoly
-        case noDrawing
+        case drawPoly
+        case dropImage
     }
 
+    private func openPicker() {
+        let picker = UIImagePickerController()
+            picker.allowsEditing = true
+            picker.delegate = self
+            present(picker, animated: true)
+    }
+
+    // MARK: - Image Picker
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        guard let image = info[.editedImage] as? UIImage else { return }
+        dismiss(animated: true)
+        currentSelectedImage = image
+    }
+    
     // MARK: - Color Picker Controls
 
     @IBOutlet var colorPickerStackView: UIStackView!
@@ -248,7 +270,8 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
      
      var singleTapRecognizer: UITapGestureRecognizer!
      var dragPanRecognizer: UIPanGestureRecognizer!
-
+    
+     var currentSelectedImage: UIImage?
      var currentShapeLayer: CAShapeLayer = {
         let shapeLayer = CAShapeLayer()
         shapeLayer.strokeColor = UIColor.black.cgColor
@@ -282,6 +305,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
         saveButton.isEnabled = false
         currentShapeLayer.path = nil
         currentShapeLayer.lineDashPattern = nil
+        currentShapeLayer.strokeColor = UIColor.black.cgColor
         currentShapeLayer.removeFromSuperlayer()
         currentShapeLayer.sublayers?.forEach { $0.removeFromSuperlayer()}
         deleteButton.removeFromSuperview()
@@ -353,7 +377,7 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
                 return UIBezierPath()
         }
     }
-     
+      
     private func addCornerPoints(_ corners: [CGPoint]) {
         
         let s = CGSize(width: #imageLiteral(resourceName: "largecircle.fill.circle").size.width/5, height: #imageLiteral(resourceName: "largecircle.fill.circle").size.width/5) // change it for scale
@@ -546,10 +570,18 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
                     default:
                          print("single tap not detected a pin")
                     }
-                }
-                }
+                }  else  {
+                    layer?.sublayers?.forEach { sublayer in
+                        let frame = self.imageView.layer.convert(sublayer.frame, from: currentShapeLayer)
+                        if frame.contains(touchPoint)  && sublayer.name == "img" {
+                            deleteButton.frame.origin = CGPoint(x: frame.midX-17, y: frame.minY - 40)
+                            imageView.addSubview(deleteButton)
+                        }
+                    }
+                  }
+             }
                 // No shape selected or added so add new one
-                if currentShapeLayer.superlayer != imageView.layer && drawingMode != .noDrawing  {
+                if currentShapeLayer.superlayer != imageView.layer && drawingMode != .dropImage {
                 // draw rectangle, ellipse etc according to selection
                 changeFillColor()
                 let path = drawShape(touch: touchPoint, mode: drawingMode)
@@ -575,13 +607,40 @@ class MarkerInsertViewController: UIViewController, UITextFieldDelegate, UIGestu
                     print("Sth is wrong!")
                 }
               
-        }
+                } else if currentShapeLayer.superlayer != imageView.layer && drawingMode == .dropImage {
+                    dropImage(touch: touchPoint)
+               }
         } else {
             print("TAPPING OUTSIDE *******")
         }
-       
   }
     
+    private func dropImage(touch: CGPoint) {
+        if let img = currentSelectedImage {
+            let coneLayer = CAShapeLayer()
+            let size =  CGSize(width: 58, height: 80)
+            coneLayer.frame = CGRect(origin: .zero, size: size)
+            coneLayer.position = CGPoint(x: touch.x, y: touch.y-40)
+            coneLayer.contents =  #imageLiteral(resourceName: "arrowtriangle.down.fill").cgImage
+            currentShapeLayer.addSublayer(coneLayer)
+            let imgLayer = CAShapeLayer()
+            imgLayer.name = "img"
+            let sizeL =  CGSize(width: 80, height: 80)
+            imgLayer.frame = CGRect(origin: .zero, size: sizeL)
+            imgLayer.position = CGPoint(x: touch.x, y: touch.y-95)
+            imgLayer.contents =  img.cgImage
+            imgLayer.cornerRadius = imgLayer.frame.height/2
+            imgLayer.borderWidth = 2
+            imgLayer.borderColor = UIColor.systemBlue.cgColor
+            imgLayer.masksToBounds = true
+            currentShapeLayer.addSublayer(imgLayer)
+            imageView.layer.addSublayer(currentShapeLayer)
+            saveButton.isEnabled = true
+            vectorType = .PIN(point: touch)
+            vectorData = VectorMetaData(color: colorInfo, iconUrl: "URL here", recordId: "", recordTypeId: "")
+        }
+    }
+     
     private func changeFillColor() {
         currentShapeLayer.fillColor? = drawingColor.associatedColor.cgColor
         switch drawingMode {

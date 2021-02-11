@@ -234,7 +234,7 @@
                                                     <constraint firstAttribute="height" constant="32" id="vwf-mX-Fca"/>
                                                 </constraints>
                                                 <state key="normal" title="Button" image="polygonShape"/>
-                                                <state key="selected" image="ellipseShapeSelected"/>
+                                                <state key="selected" image="polygonShapeSelected"/>
                                                 <connections>
                                                     <action selector="changeDrawWithButton:" destination="jvl-BP-SOu" eventType="touchUpInside" id="foU-9K-fd4"/>
                                                 </connections>
@@ -263,14 +263,13 @@
                                                     <action selector="changeDrawWithButton:" destination="jvl-BP-SOu" eventType="touchUpInside" id="ijH-xo-YBt"/>
                                                 </connections>
                                             </button>
-                                            <button opaque="NO" tag="3" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zyl-og-ga8">
+                                            <button opaque="NO" tag="4" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zyl-og-ga8">
                                                 <rect key="frame" x="6" y="168" width="32" height="32"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="32" id="2AJ-9u-j7c"/>
                                                     <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="32" id="J5h-hp-8mG"/>
                                                 </constraints>
                                                 <state key="normal" title="Button" image="selectImage"/>
-                                                <state key="selected" image="ellipseShapeSelected"/>
                                                 <connections>
                                                     <action selector="changeDrawWithButton:" destination="jvl-BP-SOu" eventType="touchUpInside" id="qXC-LZ-aHE"/>
                                                 </connections>
@@ -487,6 +486,7 @@
         <image name="pin" width="44" height="44"/>
         <image name="pinSelected" width="44" height="44"/>
         <image name="polygonShape" width="44" height="44"/>
+        <image name="polygonShapeSelected" width="44" height="44"/>
         <image name="rectangleShape" width="44" height="44"/>
         <image name="rectangleShapeSelected" width="44" height="44"/>
         <image name="red" width="44" height="44"/>
