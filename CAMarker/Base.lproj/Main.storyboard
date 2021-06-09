@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="RhK-eq-CO3">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="RhK-eq-CO3">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -52,10 +52,22 @@
                                     <action selector="searchPreviewPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="5F8-rR-D9y"/>
                                 </connections>
                             </button>
+                            <imageView clipsSubviews="YES" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="lasso" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="CgA-Bg-Ff5">
+                                <rect key="frame" x="67.5" y="520.5" width="240" height="127"/>
+                                <gestureRecognizers/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="240" id="evk-3n-QTz"/>
+                                    <constraint firstAttribute="height" constant="128" id="mKZ-9F-c3V"/>
+                                </constraints>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="YUB-et-wa9" appends="YES" id="Zgg-9d-mU2"/>
+                                </connections>
+                            </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="CgA-Bg-Ff5" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="0KC-jk-Lel"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="YJW-t1-ner" secondAttribute="trailing" constant="8" id="9cE-sG-018"/>
                             <constraint firstItem="opr-RZ-7fY" firstAttribute="top" secondItem="YJW-t1-ner" secondAttribute="bottom" constant="80" id="9fq-jm-hOI"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="0Cn-eQ-QMw" secondAttribute="trailing" constant="8" id="APg-u2-6kp"/>
@@ -63,6 +75,7 @@
                             <constraint firstItem="YJW-t1-ner" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="8" id="EJ9-FL-CdP"/>
                             <constraint firstItem="0Cn-eQ-QMw" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="8" id="FeO-de-D22"/>
                             <constraint firstItem="hSL-Ug-DeH" firstAttribute="top" secondItem="opr-RZ-7fY" secondAttribute="bottom" constant="40" id="H6s-tX-SGV"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="CgA-Bg-Ff5" secondAttribute="bottom" constant="20" id="ajc-eT-MQN"/>
                             <constraint firstItem="HRD-fz-aEg" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="jmQ-bC-rh8"/>
                             <constraint firstItem="HRD-fz-aEg" firstAttribute="top" secondItem="0Cn-eQ-QMw" secondAttribute="bottom" constant="32" id="kaA-I4-vhJ"/>
                             <constraint firstItem="hSL-Ug-DeH" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="lxU-MC-Bpv"/>
@@ -74,9 +87,15 @@
                     <connections>
                         <outlet property="imageUrl" destination="0Cn-eQ-QMw" id="2XF-rF-Twq"/>
                         <outlet property="markerInfo" destination="YJW-t1-ner" id="yyV-bv-T1v"/>
+                        <outlet property="testImage" destination="CgA-Bg-Ff5" id="cWf-fM-7F3"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+                <tapGestureRecognizer id="YUB-et-wa9">
+                    <connections>
+                        <action selector="imageTapped:" destination="BYZ-38-t0r" id="KHq-wY-Uaz"/>
+                    </connections>
+                </tapGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="5680.8000000000002" y="151.57421289355324"/>
         </scene>
@@ -481,6 +500,7 @@
         <image name="ellipseShape" width="44" height="44"/>
         <image name="ellipseShapeSelected" width="44" height="44"/>
         <image name="green" width="44" height="44"/>
+        <image name="lasso" catalog="system" width="128" height="118"/>
         <image name="magenta" width="44" height="44"/>
         <image name="orange" width="44" height="44"/>
         <image name="pin" width="44" height="44"/>

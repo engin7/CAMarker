@@ -11,7 +11,31 @@ class ViewController: UIViewController {
  
     @IBOutlet weak var imageUrl: UITextField!
     @IBOutlet weak var markerInfo: UILabel!
-     
+    @IBOutlet weak var testImage: UIImageView!
+    
+    @IBAction func imageTapped(_ sender: UITapGestureRecognizer) {
+        let imageView = sender.view as! UIImageView
+        let newImageView = UIImageView(image: imageView.image)
+        newImageView.frame = UIScreen.main.bounds
+        newImageView.backgroundColor = .white
+        newImageView.contentMode = .scaleAspectFit
+        newImageView.isUserInteractionEnabled = true
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissFullscreenImage))
+        newImageView.addGestureRecognizer(tap)
+        UIView.transition(with: self.view, duration: 0.4, options: [.transitionCrossDissolve], animations: { self.view.addSubview(newImageView) }, completion: nil)
+       
+        self.navigationController?.isNavigationBarHidden = true
+        self.tabBarController?.tabBar.isHidden = true
+        
+    }
+
+    @objc func dismissFullscreenImage(_ sender: UITapGestureRecognizer) {
+        self.navigationController?.isNavigationBarHidden = false
+        self.tabBarController?.tabBar.isHidden = false
+        
+        UIView.transition(with: self.view, duration: 0.4, options: [.transitionCrossDissolve], animations: { sender.view?.removeFromSuperview() }, completion: nil)
+    }
+    
     @IBAction func putMarkerPressed(_ sender: Any) {
         let url = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Gilbert_Stuart_Williamstown_Portrait_of_George_Washington.jpg/844px-Gilbert_Stuart_Williamstown_Portrait_of_George_Washington.jpg"
         let markerVC = MarkerInsertViewController.initiate(layoutUrl: url, onSave: { [self] data in
