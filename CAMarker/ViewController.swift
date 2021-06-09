@@ -16,13 +16,23 @@ class ViewController: UIViewController {
     @IBAction func imageTapped(_ sender: UITapGestureRecognizer) {
         let imageView = sender.view as! UIImageView
         let newImageView = UIImageView(image: imageView.image)
+        // if horizontal rotate, true will be ratio
+        if true {
+            newImageView.transform = newImageView.transform.rotated(by: .pi / 2)    // 90˚
+        }
         newImageView.frame = UIScreen.main.bounds
         newImageView.backgroundColor = .white
         newImageView.contentMode = .scaleAspectFit
         newImageView.isUserInteractionEnabled = true
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissFullscreenImage))
         newImageView.addGestureRecognizer(tap)
-        UIView.transition(with: self.view, duration: 0.4, options: [.transitionCrossDissolve], animations: { self.view.addSubview(newImageView) }, completion: nil)
+        self.view.addSubview(newImageView)
+        newImageView.alpha = 0
+        
+        UIView.transition(with: self.view, duration: 0.4, options: [.transitionCrossDissolve], animations: {
+            newImageView.alpha = 1
+          
+        }, completion: nil)
        
         self.navigationController?.isNavigationBarHidden = true
         self.tabBarController?.tabBar.isHidden = true
@@ -33,7 +43,10 @@ class ViewController: UIViewController {
         self.navigationController?.isNavigationBarHidden = false
         self.tabBarController?.tabBar.isHidden = false
         
-        UIView.transition(with: self.view, duration: 0.4, options: [.transitionCrossDissolve], animations: { sender.view?.removeFromSuperview() }, completion: nil)
+        UIView.transition(with: self.view, duration: 0.4, options: [.transitionCrossDissolve], animations: { sender.view?.alpha = 0 }, completion: {_ in sender.view?.removeFromSuperview() }
+        )
+        
+        
     }
     
     @IBAction func putMarkerPressed(_ sender: Any) {
